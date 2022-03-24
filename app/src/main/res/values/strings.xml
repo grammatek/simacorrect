@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">simacorrect</string>
+    <string name="message">Enter text</string>
+    <string name="correct">Send</string>
+    <string name="title_activity_spell_checker_settings">SpellCheckerSettingsActivity</string>
+
+
+    <!--    <string name="app_name">SampleSpellCheckerService</string>-->
+    <string name="spellchecker_name">Yfirlestur Correct</string>
+    <string name="subtype_generic" translatable="true">%s</string>
+    <string name="sample_settings">Sample settings</string>
+    <string name="sample_preference">Sample preference</string>
+</resources>

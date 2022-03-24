@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.40520833333333334" />
+        <entry key="app/src/main/res/layout/activity_display_message.xml" value="0.41822916666666665" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_spell_checker.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_spell_checker_settings.xml" value="0.2557291666666667" />
+        <entry key="app/src/main/res/layout/content_spell_checker_settings.xml" value="0.2557291666666667" />
+        <entry key="app/src/main/res/layout/fragment_first.xml" value="0.2557291666666667" />
+        <entry key="app/src/main/res/layout/fragment_spell_checker.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/pref_main.xml" value="0.15121580547112462" />
+        <entry key="app/src/main/res/layout/sdgsdg.xml" value="0.15121580547112462" />
+        <entry key="app/src/main/res/layout/spellchecker.xml" value="0.20643363728470113" />
+        <entry key="app/src/main/res/xml/method.xml" value="0.10182370820668693" />
+        <entry key="app/src/main/res/xml/pref_main.xml" value="0.15121580547112462" />
+        <entry key="app/src/main/res/xml/prefs.xml" value="0.2066869300911854" />
+        <entry key="app/src/main/res/xml/root_preferences.xml" value="0.3109375" />
+        <entry key="app/src/main/res/xml/spell_checker_settings.xml" value="0.2557291666666667" />
+        <entry key="app/src/main/res/xml/spellchecker.xml" value="0.25" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK" />
+</project>
