@@ -7,7 +7,7 @@ import android.view.textservice.TextInfo
 import android.view.textservice.SentenceSuggestionsInfo
 import org.grammatek.apis.DevelopersApi
 
-class SampleSpellCheckerService : SpellCheckerService() {
+class SimaCorrectSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
         return AndroidSpellCheckerSession()
     }
@@ -44,30 +44,34 @@ class SampleSpellCheckerService : SpellCheckerService() {
         }
 
         override fun onGetSuggestions(textInfo: TextInfo, suggestionsLimit: Int): SuggestionsInfo {
-            if (DBG) {
-                Log.d(TAG, "onGetSuggestions: " + textInfo.text)
-            }
+            Log.d(TAG, "onGetSuggestions: " + textInfo.text)
 
+            // The API we're calling returns a value with the first letter in uppercase.
+            // We need to compare against that so we also cast our first letter of the word to uppercase.
             val text: String = textInfo.text.replaceFirstChar {
                 it.uppercase()
             }
             val api = DevelopersApi()
             val response = api.correctApiPost(text)
             val correctedText = response.result?.get(0)?.get(0)?.corrected
+            var flags = 0
+            val suggestions = mutableListOf<String>()
 
+            // Check original word against corrected word. Note that correctedText
+            // always begins with a uppercase letter (Yfirlestur specifications).
             if (text != correctedText) {
-                val flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+                flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
                 val retval = correctedText.toString().replaceFirstChar {
                     it.lowercase()
                 }
+                suggestions.add(retval)
                 Log.d(TAG, retval)
-                return SuggestionsInfo(flags, arrayOf(retval))
             }
-            return SuggestionsInfo(0, arrayOf<String>())
+            return SuggestionsInfo(flags, suggestions.toTypedArray())
         }
 
         companion object {
-            private val TAG = SampleSpellCheckerService::class.java.simpleName
+            private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
             private const val DBG = true
         }
     }

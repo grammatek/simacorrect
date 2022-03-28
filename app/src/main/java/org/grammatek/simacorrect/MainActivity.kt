@@ -54,8 +54,13 @@ class MainActivity : AppCompatActivity() {
             val wordToSpan = SpannableString(etText.text)
             val annotations: List<Annotations> = response.result?.get(0)?.get(0)?.annotations!!
 
-            for(annotation in annotations) {
-                wordToSpan.setSpan(ForegroundColorSpan(Color.RED), annotation.startChar!!, annotation.endChar!!+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            for (annotation in annotations) {
+                wordToSpan.setSpan(
+                    ForegroundColorSpan(Color.RED),
+                    annotation.startChar!!,
+                    annotation.endChar!! + 1,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
 
             beforeText.text = wordToSpan
