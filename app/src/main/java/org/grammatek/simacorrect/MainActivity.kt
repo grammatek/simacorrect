@@ -14,6 +14,8 @@ import kotlinx.coroutines.*
 import org.grammatek.apis.DevelopersApi
 import org.grammatek.models.Annotations
 import android.provider.Settings
+import androidx.lifecycle.lifecycleScope
+import java.lang.NullPointerException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var beforeText: TextView
@@ -34,9 +36,7 @@ class MainActivity : AppCompatActivity() {
         btnSend = findViewById(R.id.button)
 
         btnSend.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                highlightCorrection()
-            }
+            highlightCorrection(etText.text.toString())
         }
         btnSettings.setOnClickListener {
             val intent = Intent(Settings.ACTION_SETTINGS)
@@ -45,26 +45,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun highlightCorrection() {
-        coroutineScope {
-            val api = DevelopersApi()
-            val response = api.correctApiPost(etText.text.toString())
-            val corrected = response.result?.get(0)?.get(0)?.corrected
+    private fun highlightCorrection(text: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val api = DevelopersApi()
+                val response = api.correctApiPost(text)
+                val corrected = response.result?.get(0)?.get(0)?.corrected
+                    ?: throw NullPointerException("Received null value from response corrected")
 
-            val wordToSpan = SpannableString(etText.text)
-            val annotations: List<Annotations> = response.result?.get(0)?.get(0)?.annotations!!
+                val wordToSpan = SpannableString(text)
+                val annotations: List<Annotations> = response.result?.get(0)?.get(0)?.annotations
+                    ?: throw NullPointerException("Received null value from response annotations")
 
-            for (annotation in annotations) {
-                wordToSpan.setSpan(
-                    ForegroundColorSpan(Color.RED),
-                    annotation.startChar!!,
-                    annotation.endChar!! + 1,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                for (annotation in annotations) {
+                    wordToSpan.setSpan(
+                        ForegroundColorSpan(Color.RED),
+                        annotation.startChar!!,
+                        annotation.endChar!! + 1,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                beforeText.text = wordToSpan
+                afterText.text = corrected
+            } catch (e: Exception) {
+                println("Exception: ${e.printStackTrace()}")
             }
-
-            beforeText.text = wordToSpan
-            afterText.text = corrected
         }
     }
 }

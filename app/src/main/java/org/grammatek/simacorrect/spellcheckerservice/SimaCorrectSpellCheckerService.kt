@@ -6,6 +6,9 @@ import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
 import android.view.textservice.SentenceSuggestionsInfo
 import org.grammatek.apis.DevelopersApi
+import org.grammatek.models.YfirlesturResponse
+import java.lang.Exception
+import java.lang.NullPointerException
 
 class SimaCorrectSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
@@ -51,21 +54,29 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             val text: String = textInfo.text.replaceFirstChar {
                 it.uppercase()
             }
-            val api = DevelopersApi()
-            val response = api.correctApiPost(text)
-            val correctedText = response.result?.get(0)?.get(0)?.corrected
+            var response: YfirlesturResponse
+            var correctedText: String?
             var flags = 0
             val suggestions = mutableListOf<String>()
 
-            // Check original word against corrected word. Note that correctedText
-            // always begins with a uppercase letter (Yfirlestur specifications).
-            if (text != correctedText) {
-                flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
-                val retval = correctedText.toString().replaceFirstChar {
-                    it.lowercase()
+            try {
+                val api = DevelopersApi()
+                response = api.correctApiPost(text)
+                correctedText = response.result?.get(0)?.get(0)?.corrected
+                    ?: throw NullPointerException("corrected is null")
+
+                // Check original word against corrected word. Note that correctedText
+                // always begins with a uppercase letter (Yfirlestur specifications).
+                if (text != correctedText) {
+                    flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+                    val retval = correctedText.toString().replaceFirstChar {
+                        it.lowercase()
+                    }
+                    suggestions.add(retval)
+                    Log.d(TAG, retval)
                 }
-                suggestions.add(retval)
-                Log.d(TAG, retval)
+            } catch (e: Exception) {
+                println("Exception: ${e.printStackTrace()}")
             }
             return SuggestionsInfo(flags, suggestions.toTypedArray())
         }
