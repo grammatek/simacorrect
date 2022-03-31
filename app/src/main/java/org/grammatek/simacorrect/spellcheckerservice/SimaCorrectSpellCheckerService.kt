@@ -1,5 +1,7 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
+import android.database.Cursor
+import android.content.ContentResolver
 import android.service.textservice.SpellCheckerService
 import android.util.Log
 import android.view.textservice.SuggestionsInfo
@@ -9,16 +11,48 @@ import org.grammatek.apis.DevelopersApi
 import org.grammatek.models.YfirlesturResponse
 import java.lang.Exception
 import java.lang.NullPointerException
+import android.provider.UserDictionary.Words
+import android.database.ContentObserver
 
 class SimaCorrectSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
-        return AndroidSpellCheckerSession()
+        return AndroidSpellCheckerSession(contentResolver)
     }
 
-    private class AndroidSpellCheckerSession: Session() {
+    private class AndroidSpellCheckerSession(contentResolver: ContentResolver): Session() {
         private lateinit var mLocale: String
+        private var mContentResolver: ContentResolver = contentResolver
+        private var userDict: ArrayList<String> = ArrayList()
+
         override fun onCreate() {
             mLocale = locale
+            loadUserDictionary()
+
+            // Register a listener for changes in the user dictionary,
+            // reload the user dictionary if we detect changes
+            mContentResolver.registerContentObserver(
+                Words.CONTENT_URI,
+                false,
+                object : ContentObserver(null) {
+                    override fun onChange(selfChange: Boolean) {
+                        Log.d(TAG, "Observed changes in user dictionary")
+                        loadUserDictionary()
+                    }
+                })
+        }
+
+        private fun loadUserDictionary() {
+            Log.d(TAG, "loadUserDictionary")
+            // from user dictionary, query for words with locale = "mLocale"
+            val cursor: Cursor? = mContentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
+                "${Words.LOCALE} = ?", arrayOf(mLocale), null)
+            val index = cursor!!.getColumnIndex(Words.WORD)
+            val words = ArrayList<String>()
+            while (cursor.moveToNext()) {
+                words.add(cursor.getString(index))
+            }
+            cursor.close()
+            userDict = words
         }
 
         override fun onGetSuggestionsMultiple(
@@ -48,9 +82,9 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
         override fun onGetSuggestions(textInfo: TextInfo, suggestionsLimit: Int): SuggestionsInfo {
             Log.d(TAG, "onGetSuggestions: " + textInfo.text)
-
-            // The API we're calling returns a value with the first letter in uppercase.
-            // We need to compare against that so we also cast our first letter of the word to uppercase.
+            // The API we're calling returns a value with the first letter in uppercase and since we're
+            // calling it for each word we need to compare the original word with the first char in uppercase
+            // against the corrected word.
             val text: String = textInfo.text.replaceFirstChar {
                 it.uppercase()
             }
@@ -59,26 +93,31 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             var flags = 0
             val suggestions = mutableListOf<String>()
 
-            try {
-                val api = DevelopersApi()
-                response = api.correctApiPost(text)
-                correctedText = response.result?.get(0)?.get(0)?.corrected
-                    ?: throw NullPointerException("corrected is null")
-
-                // Check original word against corrected word. Note that correctedText
-                // always begins with a uppercase letter (Yfirlestur specifications).
-                if (text != correctedText) {
-                    flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
-                    val retval = correctedText.toString().replaceFirstChar {
-                        it.lowercase()
-                    }
-                    suggestions.add(retval)
-                    Log.d(TAG, retval)
-                }
-            } catch (e: Exception) {
-                println("Exception: ${e.printStackTrace()}")
+            if(userDict.contains(textInfo.text)) {
+                flags = SuggestionsInfo.RESULT_ATTR_IN_THE_DICTIONARY
             }
-            return SuggestionsInfo(flags, suggestions.toTypedArray())
+            else {
+                try {
+                    val api = DevelopersApi()
+                    response = api.correctApiPost(text)
+                    correctedText = response.result?.get(0)?.get(0)?.corrected
+                        ?: throw NullPointerException("Received null value from response corrected")
+
+                    if (text != correctedText) {
+                        flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+                        // Return word with the first char as uppercase if it was so originally.
+                        // Only necessary because of the specifications set by the API endpoint.
+                        val retval = correctedText.toString().replaceFirstChar {
+                            it.lowercase()
+                        }
+                        suggestions.add(retval)
+                    }
+
+                } catch (e: Exception) {
+                    println("Exception: ${e.printStackTrace()}")
+                }
+            }
+            return SuggestionsInfo(flags, suggestions.toTypedArray(), textInfo.cookie, textInfo.sequence)
         }
 
         companion object {
