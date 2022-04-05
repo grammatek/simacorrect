@@ -41,12 +41,13 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 })
         }
 
+        @Synchronized
         private fun loadUserDictionary() {
             Log.d(TAG, "loadUserDictionary")
             // from user dictionary, query for words with locale = "mLocale"
             val cursor: Cursor? = mContentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
-                "${Words.LOCALE} = ?", arrayOf(mLocale), null)
-            val index = cursor!!.getColumnIndex(Words.WORD)
+                "${Words.LOCALE} = ?", arrayOf(mLocale), null) ?: return
+            val index = cursor?.getColumnIndex(Words.WORD) ?: return
             val words = ArrayList<String>()
             while (cursor.moveToNext()) {
                 words.add(cursor.getString(index))
@@ -65,7 +66,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
             for (i in 0 until length) {
                 retval[i] = onGetSuggestions(textInfos[i], suggestionsLimit)
-                retval[i]!!.setCookieAndSequence(
+                retval[i]?.setCookieAndSequence(
                     textInfos[i].cookie, textInfos[i].sequence
                 )
             }
@@ -88,8 +89,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             val text: String = textInfo.text.replaceFirstChar {
                 it.uppercase()
             }
-            var response: YfirlesturResponse
-            var correctedText: String?
             var flags = 0
             val suggestions = mutableListOf<String>()
 
@@ -99,8 +98,8 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             else {
                 try {
                     val api = DevelopersApi()
-                    response = api.correctApiPost(text)
-                    correctedText = response.result?.get(0)?.get(0)?.corrected
+                    val response = api.correctApiPost(text)
+                    val correctedText = response.result?.get(0)?.get(0)?.corrected
                         ?: throw NullPointerException("Received null value from response corrected")
 
                     if (text != correctedText) {
