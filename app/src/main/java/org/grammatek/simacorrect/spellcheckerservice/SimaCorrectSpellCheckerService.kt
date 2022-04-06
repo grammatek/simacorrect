@@ -8,7 +8,6 @@ import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
 import android.view.textservice.SentenceSuggestionsInfo
 import org.grammatek.apis.DevelopersApi
-import org.grammatek.models.YfirlesturResponse
 import java.lang.Exception
 import java.lang.NullPointerException
 import android.provider.UserDictionary.Words
@@ -20,17 +19,17 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
     }
 
     private class AndroidSpellCheckerSession(contentResolver: ContentResolver): Session() {
-        private lateinit var mLocale: String
-        private var mContentResolver: ContentResolver = contentResolver
-        private var userDict: ArrayList<String> = ArrayList()
+        private lateinit var _locale: String
+        private var _contentResolver: ContentResolver = contentResolver
+        private var _userDict: ArrayList<String> = ArrayList()
 
         override fun onCreate() {
-            mLocale = locale
+            _locale = locale
             loadUserDictionary()
 
             // Register a listener for changes in the user dictionary,
             // reload the user dictionary if we detect changes
-            mContentResolver.registerContentObserver(
+            _contentResolver.registerContentObserver(
                 Words.CONTENT_URI,
                 false,
                 object : ContentObserver(null) {
@@ -44,16 +43,16 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         @Synchronized
         private fun loadUserDictionary() {
             Log.d(TAG, "loadUserDictionary")
-            // from user dictionary, query for words with locale = "mLocale"
-            val cursor: Cursor? = mContentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
-                "${Words.LOCALE} = ?", arrayOf(mLocale), null) ?: return
+            // from user dictionary, query for words with locale = "_locale"
+            val cursor: Cursor? = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
+                "${Words.LOCALE} = ?", arrayOf(_locale), null) ?: return
             val index = cursor?.getColumnIndex(Words.WORD) ?: return
             val words = ArrayList<String>()
             while (cursor.moveToNext()) {
                 words.add(cursor.getString(index))
             }
             cursor.close()
-            userDict = words
+            _userDict = words
         }
 
         override fun onGetSuggestionsMultiple(
@@ -92,7 +91,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             var flags = 0
             val suggestions = mutableListOf<String>()
 
-            if(userDict.contains(textInfo.text)) {
+            if(_userDict.contains(textInfo.text)) {
                 flags = SuggestionsInfo.RESULT_ATTR_IN_THE_DICTIONARY
             }
             else {
@@ -106,7 +105,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                         flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
                         // Return word with the first char as uppercase if it was so originally.
                         // Only necessary because of the specifications set by the API endpoint.
-                        val retval = correctedText.toString().replaceFirstChar {
+                        val retval = correctedText.replaceFirstChar {
                             it.lowercase()
                         }
                         suggestions.add(retval)
