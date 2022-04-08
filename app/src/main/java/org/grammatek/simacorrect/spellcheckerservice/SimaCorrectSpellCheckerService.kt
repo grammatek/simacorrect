@@ -1,17 +1,17 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
-import android.database.Cursor
 import android.content.ContentResolver
+import android.content.Context
+import android.database.ContentObserver
+import android.database.Cursor
+import android.provider.UserDictionary.Words
 import android.service.textservice.SpellCheckerService
 import android.util.Log
+import android.view.textservice.SentenceSuggestionsInfo
 import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
-import android.view.textservice.SentenceSuggestionsInfo
-import org.grammatek.apis.DevelopersApi
-import java.lang.Exception
-import java.lang.NullPointerException
-import android.provider.UserDictionary.Words
-import android.database.ContentObserver
+import org.grammatek.simacorrect.network.ConnectionManager
+
 
 class SimaCorrectSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
@@ -44,9 +44,9 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         private fun loadUserDictionary() {
             Log.d(TAG, "loadUserDictionary")
             // from user dictionary, query for words with locale = "_locale"
-            val cursor: Cursor? = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
+            val cursor: Cursor = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
                 "${Words.LOCALE} = ?", arrayOf(_locale), null) ?: return
-            val index = cursor?.getColumnIndex(Words.WORD) ?: return
+            val index = cursor.getColumnIndex(Words.WORD) ?: return
             val words = ArrayList<String>()
             while (cursor.moveToNext()) {
                 words.add(cursor.getString(index))
@@ -58,7 +58,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         override fun onGetSuggestionsMultiple(
             textInfos: Array<TextInfo>,
             suggestionsLimit: Int, sequentialWords: Boolean
-        ): Array<SuggestionsInfo?>? {
+        ): Array<SuggestionsInfo?> {
             Log.d(TAG, "onGetSuggestionsMultiple: " + textInfos[0].text)
             val length = textInfos.size
             val retval = arrayOfNulls<SuggestionsInfo>(length)
@@ -90,29 +90,14 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             }
             var flags = 0
             val suggestions = mutableListOf<String>()
-
             if(_userDict.contains(textInfo.text)) {
                 flags = SuggestionsInfo.RESULT_ATTR_IN_THE_DICTIONARY
             }
             else {
-                try {
-                    val api = DevelopersApi()
-                    val response = api.correctApiPost(text)
-                    val correctedText = response.result?.get(0)?.get(0)?.corrected
-                        ?: throw NullPointerException("Received null value from response corrected")
-
-                    if (text != correctedText) {
-                        flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
-                        // Return word with the first char as uppercase if it was so originally.
-                        // Only necessary because of the specifications set by the API endpoint.
-                        val retval = correctedText.replaceFirstChar {
-                            it.lowercase()
-                        }
-                        suggestions.add(retval)
-                    }
-
-                } catch (e: Exception) {
-                    println("Exception: ${e.printStackTrace()}")
+                val correctedWord = ConnectionManager.correctWord(textInfo.text)
+                if(correctedWord != null) {
+                    flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+                    suggestions.add(correctedWord)
                 }
             }
             return SuggestionsInfo(flags, suggestions.toTypedArray(), textInfo.cookie, textInfo.sequence)
