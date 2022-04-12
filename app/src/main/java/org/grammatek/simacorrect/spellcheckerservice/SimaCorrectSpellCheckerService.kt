@@ -1,7 +1,6 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
 import android.content.ContentResolver
-import android.content.Context
 import android.database.ContentObserver
 import android.database.Cursor
 import android.provider.UserDictionary.Words
@@ -13,6 +12,9 @@ import android.view.textservice.TextInfo
 import org.grammatek.simacorrect.network.ConnectionManager
 
 
+/**
+ * Implements Simacorrect spell checking as a SpellCheckerService
+ */
 class SimaCorrectSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
         return AndroidSpellCheckerSession(contentResolver)
@@ -27,8 +29,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             _locale = locale
             loadUserDictionary()
 
-            // Register a listener for changes in the user dictionary,
-            // reload the user dictionary if we detect changes
+            // Register a listener for changes in the user dictionary.
             _contentResolver.registerContentObserver(
                 Words.CONTENT_URI,
                 false,
@@ -40,6 +41,9 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 })
         }
 
+        /**
+         * Synchronously loads the user's dictionary into the spell checker session.
+         */
         @Synchronized
         private fun loadUserDictionary() {
             Log.d(TAG, "loadUserDictionary")
@@ -60,16 +64,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             suggestionsLimit: Int, sequentialWords: Boolean
         ): Array<SuggestionsInfo?> {
             Log.d(TAG, "onGetSuggestionsMultiple: " + textInfos[0].text)
-            val length = textInfos.size
-            val retval = arrayOfNulls<SuggestionsInfo>(length)
-
-            for (i in 0 until length) {
-                retval[i] = onGetSuggestions(textInfos[i], suggestionsLimit)
-                retval[i]?.setCookieAndSequence(
-                    textInfos[i].cookie, textInfos[i].sequence
-                )
-            }
-            return retval
+            return super.onGetSuggestionsMultiple(textInfos, suggestionsLimit, sequentialWords)
         }
 
         override fun onGetSentenceSuggestionsMultiple(
@@ -80,14 +75,18 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             return super.onGetSentenceSuggestionsMultiple(textInfos, suggestionsLimit)
         }
 
+        /**
+         * Fetches spell checking suggestions.
+         *
+         * @param [textInfo] contains the text that this method fetches suggestions for.
+         * @param [suggestionsLimit] the limit of suggestions given.
+         * @return [SuggestionsInfo]
+         */
         override fun onGetSuggestions(textInfo: TextInfo, suggestionsLimit: Int): SuggestionsInfo {
             Log.d(TAG, "onGetSuggestions: " + textInfo.text)
             // The API we're calling returns a value with the first letter in uppercase and since we're
             // calling it for each word we need to compare the original word with the first char in uppercase
             // against the corrected word.
-            val text: String = textInfo.text.replaceFirstChar {
-                it.uppercase()
-            }
             var flags = 0
             val suggestions = mutableListOf<String>()
             if(_userDict.contains(textInfo.text)) {
@@ -95,7 +94,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             }
             else {
                 val correctedWord = ConnectionManager.correctWord(textInfo.text)
-                if(correctedWord != null) {
+                if(correctedWord != "") {
                     flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
                     suggestions.add(correctedWord)
                 }
@@ -105,7 +104,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
         companion object {
             private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
-            private const val DBG = true
         }
     }
 }
