@@ -1,18 +1,20 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
-import android.database.Cursor
 import android.content.ContentResolver
+import android.database.ContentObserver
+import android.database.Cursor
+import android.provider.UserDictionary.Words
 import android.service.textservice.SpellCheckerService
 import android.util.Log
+import android.view.textservice.SentenceSuggestionsInfo
 import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
-import android.view.textservice.SentenceSuggestionsInfo
-import org.grammatek.apis.DevelopersApi
-import java.lang.Exception
-import java.lang.NullPointerException
-import android.provider.UserDictionary.Words
-import android.database.ContentObserver
+import org.grammatek.simacorrect.network.ConnectionManager
 
+
+/**
+ * Implements Simacorrect spell checking as a SpellCheckerService
+ */
 class SimaCorrectSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
         return AndroidSpellCheckerSession(contentResolver)
@@ -27,8 +29,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             _locale = locale
             loadUserDictionary()
 
-            // Register a listener for changes in the user dictionary,
-            // reload the user dictionary if we detect changes
+            // Register a listener for changes in the user dictionary.
             _contentResolver.registerContentObserver(
                 Words.CONTENT_URI,
                 false,
@@ -40,13 +41,16 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 })
         }
 
+        /**
+         * Synchronously loads the user's dictionary into the spell checker session.
+         */
         @Synchronized
         private fun loadUserDictionary() {
             Log.d(TAG, "loadUserDictionary")
             // from user dictionary, query for words with locale = "_locale"
-            val cursor: Cursor? = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
+            val cursor: Cursor = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
                 "${Words.LOCALE} = ?", arrayOf(_locale), null) ?: return
-            val index = cursor?.getColumnIndex(Words.WORD) ?: return
+            val index = cursor.getColumnIndex(Words.WORD) ?: return
             val words = ArrayList<String>()
             while (cursor.moveToNext()) {
                 words.add(cursor.getString(index))
@@ -58,18 +62,9 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         override fun onGetSuggestionsMultiple(
             textInfos: Array<TextInfo>,
             suggestionsLimit: Int, sequentialWords: Boolean
-        ): Array<SuggestionsInfo?>? {
+        ): Array<SuggestionsInfo?> {
             Log.d(TAG, "onGetSuggestionsMultiple: " + textInfos[0].text)
-            val length = textInfos.size
-            val retval = arrayOfNulls<SuggestionsInfo>(length)
-
-            for (i in 0 until length) {
-                retval[i] = onGetSuggestions(textInfos[i], suggestionsLimit)
-                retval[i]?.setCookieAndSequence(
-                    textInfos[i].cookie, textInfos[i].sequence
-                )
-            }
-            return retval
+            return super.onGetSuggestionsMultiple(textInfos, suggestionsLimit, sequentialWords)
         }
 
         override fun onGetSentenceSuggestionsMultiple(
@@ -80,39 +75,28 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             return super.onGetSentenceSuggestionsMultiple(textInfos, suggestionsLimit)
         }
 
+        /**
+         * Fetches spell checking suggestions.
+         *
+         * @param [textInfo] contains the text that this method fetches suggestions for.
+         * @param [suggestionsLimit] the limit of suggestions given.
+         * @return [SuggestionsInfo]
+         */
         override fun onGetSuggestions(textInfo: TextInfo, suggestionsLimit: Int): SuggestionsInfo {
             Log.d(TAG, "onGetSuggestions: " + textInfo.text)
             // The API we're calling returns a value with the first letter in uppercase and since we're
             // calling it for each word we need to compare the original word with the first char in uppercase
             // against the corrected word.
-            val text: String = textInfo.text.replaceFirstChar {
-                it.uppercase()
-            }
             var flags = 0
             val suggestions = mutableListOf<String>()
-
             if(_userDict.contains(textInfo.text)) {
                 flags = SuggestionsInfo.RESULT_ATTR_IN_THE_DICTIONARY
             }
             else {
-                try {
-                    val api = DevelopersApi()
-                    val response = api.correctApiPost(text)
-                    val correctedText = response.result?.get(0)?.get(0)?.corrected
-                        ?: throw NullPointerException("Received null value from response corrected")
-
-                    if (text != correctedText) {
-                        flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
-                        // Return word with the first char as uppercase if it was so originally.
-                        // Only necessary because of the specifications set by the API endpoint.
-                        val retval = correctedText.replaceFirstChar {
-                            it.lowercase()
-                        }
-                        suggestions.add(retval)
-                    }
-
-                } catch (e: Exception) {
-                    println("Exception: ${e.printStackTrace()}")
+                val correctedWord = ConnectionManager.correctWord(textInfo.text)
+                if(correctedWord != "") {
+                    flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+                    suggestions.add(correctedWord)
                 }
             }
             return SuggestionsInfo(flags, suggestions.toTypedArray(), textInfo.cookie, textInfo.sequence)
@@ -120,7 +104,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
         companion object {
             private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
-            private const val DBG = true
         }
     }
 }
