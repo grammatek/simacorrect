@@ -4,7 +4,6 @@ import android.app.Application
 import android.util.Log
 import org.grammatek.simacorrect.network.ConnectionManager
 
-
 class App : Application() {
     private lateinit var _connectionChecker: ConnectionManager
 

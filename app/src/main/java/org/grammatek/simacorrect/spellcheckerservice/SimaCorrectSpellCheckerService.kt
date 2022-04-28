@@ -11,7 +11,6 @@ import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
 import org.grammatek.simacorrect.network.ConnectionManager
 
-
 /**
  * Implements Simacorrect spell checking as a SpellCheckerService
  */
@@ -50,7 +49,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             // from user dictionary, query for words with locale = "_locale"
             val cursor: Cursor = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
                 "${Words.LOCALE} = ?", arrayOf(_locale), null) ?: return
-            val index = cursor.getColumnIndex(Words.WORD) ?: return
+            val index = cursor.getColumnIndex(Words.WORD)
             val words = ArrayList<String>()
             while (cursor.moveToNext()) {
                 words.add(cursor.getString(index))
@@ -63,7 +62,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             textInfos: Array<TextInfo>,
             suggestionsLimit: Int, sequentialWords: Boolean
         ): Array<SuggestionsInfo?> {
-            Log.d(TAG, "onGetSuggestionsMultiple: " + textInfos[0].text)
+            Log.d(TAG, "onGetSuggestionsMultiple: ${textInfos.size}")
             return super.onGetSuggestionsMultiple(textInfos, suggestionsLimit, sequentialWords)
         }
 
@@ -71,7 +70,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             textInfos: Array<out TextInfo>?,
             suggestionsLimit: Int,
         ): Array<SentenceSuggestionsInfo> {
-            Log.d(TAG, "onGetSentenceSuggestionsMultiple:")
+            Log.d(TAG, "onGetSentenceSuggestionsMultiple: ${textInfos?.size}")
             return super.onGetSentenceSuggestionsMultiple(textInfos, suggestionsLimit)
         }
 

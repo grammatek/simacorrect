@@ -1,75 +1,39 @@
 package org.grammatek.simacorrect
 
 import android.content.Intent
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
-import android.widget.Button
+import android.provider.Settings
 import android.widget.EditText
 import android.widget.TextView
-import kotlinx.coroutines.*
-import org.grammatek.apis.DevelopersApi
-import org.grammatek.models.Annotations
-import android.provider.Settings
-import androidx.lifecycle.lifecycleScope
-import java.lang.NullPointerException
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var beforeText: TextView
-    private lateinit var afterText: TextView
     private lateinit var etText: EditText
-    private lateinit var btnSend: Button
-
-    private lateinit var btnSettings: Button
+    private lateinit var btnSettings: TextView
+    private lateinit var btnFeedback: TextView
+    private lateinit var btnAbout: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         etText = findViewById(R.id.textInputEditText)
-        afterText = findViewById(R.id.text_after)
-        beforeText = findViewById(R.id.text_before)
-        btnSettings = findViewById(R.id.button2)
-        btnSend = findViewById(R.id.button)
+        btnFeedback = findViewById(R.id.feedback)
+        btnSettings = findViewById(R.id.settings)
+        btnAbout = findViewById(R.id.about)
 
-        btnSend.setOnClickListener {
-            highlightCorrection(etText.text.toString())
+        btnFeedback.setOnClickListener {
+            val intent = Intent(this, EmailFeedback::class.java)
+            startActivity(intent)
         }
         btnSettings.setOnClickListener {
             val intent = Intent(Settings.ACTION_SETTINGS)
             intent.setClassName("com.android.settings", "com.android.settings.LanguageSettings")
             startActivity(intent)
         }
-    }
-
-    private fun highlightCorrection(text: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val api = DevelopersApi()
-                val response = api.correctApiPost(text)
-                val corrected = response.result?.get(0)?.get(0)?.corrected
-                    ?: throw NullPointerException("Received null value from response corrected")
-
-                val wordToSpan = SpannableString(text)
-                val annotations: List<Annotations> = response.result?.get(0)?.get(0)?.annotations
-                    ?: throw NullPointerException("Received null value from response annotations")
-
-                for (annotation in annotations) {
-                    wordToSpan.setSpan(
-                        ForegroundColorSpan(Color.RED),
-                        annotation.startChar!!,
-                        annotation.endChar!! + 1,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                    )
-                }
-                beforeText.text = wordToSpan
-                afterText.text = corrected
-            } catch (e: Exception) {
-                println("Exception: ${e.printStackTrace()}")
-            }
+        btnAbout.setOnClickListener {
+            val intent = Intent(this, AboutActivity::class.java)
+            startActivity(intent)
         }
     }
 }
