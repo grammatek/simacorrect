@@ -45,7 +45,9 @@ class ConnectionManager {
                     g_isNetworkConnected = true
                     startApiServiceHealthCheck()
                 } else {
+                    Log.d(TAG, "Internet unavailable")
                     g_isNetworkConnected = false
+                    stopApiServiceHealthCheck()
                 }
             }
 
@@ -143,7 +145,6 @@ class ConnectionManager {
                     ?: throw NullPointerException("Received null value from response corrected text")
                 val originalText = response.result?.get(0)?.get(0)?.original?.lowercase()
                     ?: throw NullPointerException("Received null value from response original text")
-                Log.d(TAG, "corrected text: $correctedText, original text $originalText")
                 if(correctedText != originalText) {
                     return correctedText
                 }
