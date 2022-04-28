@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gt_gray"
     tools:context=".MainActivity">
 
 
@@ -13,102 +12,83 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="347dp"
         android:layout_height="64dp"
-        android:layout_marginTop="60dp"
-        android:hint="Enter text"
+        android:layout_marginTop="68dp"
+        android:hint="@string/text_box_hint"
         app:endIconMode="clear_text"
-        app:layout_constraintBottom_toTopOf="@+id/text_before"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditText"
-            android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="0dp"
             android:layout_marginEnd="0dp"
+            android:inputType="text"
             android:textColor="#000000" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="348dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="32dp"
-        android:text="Send"
-        app:layout_constraintBottom_toTopOf="@+id/text_before"
+    <TextView
+        android:id="@+id/feedback"
+        style="@style/info_view_style_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:drawablePadding="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="0dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="@string/feedback"
+        android:textAlignment="viewStart"
+        app:drawableStartCompat="@drawable/ic_icon_feedback"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <TextView
+        android:id="@+id/settings"
+        style="@style/info_view_style_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:drawablePadding="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="0dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="@string/spell_checker_settings"
+        app:drawableStartCompat="@drawable/ic_icon_settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/feedback" />
+
+    <TextView
+        android:id="@+id/about"
+        style="@style/info_view_style_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:drawablePadding="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="0dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="@string/about"
+        app:drawableStartCompat="@drawable/ic_icon_about"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
-
-    <TextView
-        android:id="@+id/text_before"
-        android:layout_width="346dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="40dp"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
-
-    <TextView
-        android:id="@+id/text_after"
-        android:layout_width="346dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="40dp"
-        android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_before" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="337dp"
-        android:text="Before"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
-
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="348dp"
-        android:text="After"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_before" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Settings"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_after"
-        app:layout_constraintVertical_bias="0.125" />
-
-    <!--    <androidx.fragment.app.FragmentContainerView-->
-<!--        android:id="@+id/settings_container"-->
-<!--        android:name="org.grammatek.simacorrect.spellcheckerservice.SpellCheckerSettingsFragment"-->
-<!--        android:layout_width="336dp"-->
-<!--        android:layout_height="124dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/button2"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/text_after" />-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>
