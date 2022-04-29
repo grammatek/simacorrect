@@ -1,10 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Simacorrect" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.Simacorrect" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/baby_blue</item>
         <item name="colorPrimaryVariant">@color/light_black</item>
         <item name="colorOnPrimary">@color/light_black</item>
+        <item name="colorControlNormal">@color/teal_700</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
@@ -25,16 +26,13 @@
     <style name="info_view_style_1">
         <item name="android:textAppearance">
             @android:style/TextAppearance.Large</item>
-        <item name="android:textColor">@color/light_black</item>
     </style>
 
     <style name="info_view_style_2">
         <item name="android:textAppearance">
             @android:style/TextAppearance.Small</item>
-        <item name="android:textColor">@color/light_black</item>
         <item name="android:textColorLink">#6EB1F8</item>
         <item name="android:autoLink">web</item>
         <item name="android:linksClickable">true</item>
-        <item name="android:layout_marginTop">8dp</item>
     </style>
 </resources>
