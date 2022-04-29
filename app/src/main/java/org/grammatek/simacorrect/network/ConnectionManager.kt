@@ -40,7 +40,7 @@ class ConnectionManager {
         manager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 val nc: NetworkCapabilities? = manager.getNetworkCapabilities(network)
-                if(nc?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) != null) {
+                if(nc != null && nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                     Log.d(TAG, "Internet available")
                     g_isNetworkConnected = true
                     startApiServiceHealthCheck()
