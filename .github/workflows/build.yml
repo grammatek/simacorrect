@@ -12,13 +12,18 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: "zulu"
-          java-version: 9
+          java-version: 11
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
       - name: Set execution flag for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
+#       - name: Build with Gradle
+#         run: ./gradlew build
+      - name: "Build the app"
+        run: |
+          git submodule update --init
+          ./gradlew assemble
+          ./gradlew build -x test
       - name: Archive reports
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
