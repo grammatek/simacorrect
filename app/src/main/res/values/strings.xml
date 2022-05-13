@@ -1,13 +1,36 @@
 <resources>
-    <string name="app_name">simacorrect</string>
+    <string name="app_name">Simacorrect</string>
     <string name="message">Enter text</string>
-    <string name="correct">Send</string>
     <string name="title_activity_spell_checker_settings">SpellCheckerSettingsActivity</string>
 
 
-    <!--    <string name="app_name">SampleSpellCheckerService</string>-->
     <string name="spellchecker_name">Yfirlestur Correct</string>
     <string name="subtype_generic" translatable="true">%s</string>
     <string name="sample_settings">Sample settings</string>
     <string name="sample_preference">Sample preference</string>
+    <!-- Main -->
+    <string name="spell_checker_settings">Spell Checker Settings</string>
+    <string name="about">About</string>
+    <string name="feedback">Feedback</string>
+    <string name="text_box_hint">Try it out!</string>
+    <!-- INFO -->
+    <string name="info_copyright">Copyright</string>
+    <string name="info_url">URL</string>
+    <string name="info_privacy_notice">Privacy notice</string>
+    <string name="info_privacy_notice_url">https://www.grammatek.com/legal#simacorrect</string>
+    <string name="info_runtime_header">RUNTIME_HEADER</string>
+    <string name="info_runtime">Runtime information</string>
+    <string name="info_android_version">Android Version</string>
+    <string name="info_app_version">Version</string>
+    <string name="info_version_error">Error retrieving version info</string>
+    <string name="info_supported_abis">Supported ABIs</string>
+    <string name="info_phone_model">Phone Model</string>
+    <string name="info_about">© (2022) Grammatek ehf.\nhttps://www.grammatek.com</string>
+    <string name="info_repo_url">https://github.com/grammatek/simacorrect</string>
+    <string name="info_benchmark">Benchmark</string>
+    <string name="info_benchmark_value">times faster than real time</string>
+    <!-- Feedback -->
+    <string name="email_subject">Feedback on Símacorrect</string>
+    <string name="email_message">Feedback: </string>
+    <string name="send_message">Send mail …</string>
 </resources>

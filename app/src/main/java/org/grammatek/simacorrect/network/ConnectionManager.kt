@@ -40,12 +40,14 @@ class ConnectionManager {
         manager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 val nc: NetworkCapabilities? = manager.getNetworkCapabilities(network)
-                if(nc?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) != null) {
+                if(nc != null && nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                     Log.d(TAG, "Internet available")
                     g_isNetworkConnected = true
                     startApiServiceHealthCheck()
                 } else {
+                    Log.d(TAG, "Internet unavailable")
                     g_isNetworkConnected = false
+                    stopApiServiceHealthCheck()
                 }
             }
 
@@ -143,7 +145,6 @@ class ConnectionManager {
                     ?: throw NullPointerException("Received null value from response corrected text")
                 val originalText = response.result?.get(0)?.get(0)?.original?.lowercase()
                     ?: throw NullPointerException("Received null value from response original text")
-                Log.d(TAG, "corrected text: $correctedText, original text $originalText")
                 if(correctedText != originalText) {
                     return correctedText
                 }
