@@ -15,8 +15,6 @@
     <string name="info_url">Netfang</string>
     <string name="info_privacy_notice">Persónuvernd</string>
     <string name="info_privacy_notice_url">https://www.grammatek.com/legal#simacorrect</string>
-    <string name="info_runtime_header">RUNTIME_HEADER</string>
-    <string name="info_runtime">Keyrsluupplýsingar</string>
     <string name="info_android_version">Android Útgáfa</string>
     <string name="info_app_version">Útgáfa</string>
     <string name="info_version_error">Villa við að ná í uppl. um útgáfu</string>
