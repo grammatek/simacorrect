@@ -62,65 +62,27 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             textInfos: Array<TextInfo>,
             suggestionsLimit: Int, sequentialWords: Boolean
         ): Array<SuggestionsInfo> {
-            val suggestionList = mutableListOf<SuggestionsInfo>()
+            val suggestionList: Array<SuggestionsInfo>
 
             try {
-                var textToCorrect = ""
-                for (text in textInfos) {
-                    textToCorrect += "${text.text} "
-                }
+                val textToCorrect = textInfos.joinToString(separator = " ") { it.text }
                 val response = ConnectionManager.correctSentence(textToCorrect)
                 val annotation = response!!.result?.get(0)?.get(0)?.annotations ?: return arrayOf()
                 if (annotation.isEmpty()) {
                     return arrayOf()
                 }
 
-                val tokens = response.result?.get(0)?.get(0)?.tokens ?: return arrayOf()
-
-                // Assume all tokens (words) are "un-annotated" to reduce the complexity of
-                // iterating through all the tokens and annotations.
-                for (i in tokens.indices) {
-                    suggestionList.add(
-                        SuggestionsInfo(
-                            0, arrayOf(tokens[i].x.toString()),
-                            textInfos[i].cookie, textInfos[i].sequence
-                        )
-                    )
-                }
-                for(i in annotation.indices) {
-                    // if a word has more than 1 annotation attached to it,
-                    // most likely one of those annotations has a suggest = null
-                    if (annotation[i].suggest == null) {
-                        continue
-                    }
-                    // TODO: Likely not necessary to split when 'onGetSentenceSuggestionsMultiple' has been reworked.
-                    val annotationSuggestion = annotation[i].suggest!!.replace("\\s+".toRegex(), " ").trim().split(" ").toMutableList()
-
-                    for(j in annotation[i].start!!..annotation[i].end!!) {
-                        // TODO: Subject to change with 'onGetSentenceSuggestionsMultiple' changes.
-                        //  Currently this makes breaking words into two impossible.
-                        val suggestion = annotationSuggestion.removeFirst()
-                        var flag = 0
-                        // TODO: GreynirCorrect contains all the annotation.codes but it's unclear which
-                        //  are grammar errors. However 'P_WRONG' covers a good amount of them, if not all.
-                        flag = if (annotation[i].code!!.contains("P_WRONG")) {
-                            SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
-                        } else {
-                            SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
-                        }
-                        Log.d(TAG, "flag: $flag, suggestion: $suggestion")
-                        suggestionList[j] = SuggestionsInfo(flag, arrayOf(suggestion), textInfos[j].cookie, textInfos[j].sequence)
-                    }
-                }
+                val ylAnnotation = YfirlesturAnnotation(annotation, response.text.toString())
+                suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
             } catch (e: Exception) {
                 Log.d(TAG, "Exception: $e")
                 return arrayOf()
             }
 
-            for (i in suggestionList.indices) {
-                suggestionList[i].setCookieAndSequence(textInfos[i].cookie, textInfos[i].sequence)
+            for(sl in suggestionList) {
+                sl.setCookieAndSequence(textInfos[0].cookie, sl.sequence)
             }
-            return suggestionList.toTypedArray()
+            return suggestionList
         }
 
         override fun onGetSentenceSuggestionsMultiple(
