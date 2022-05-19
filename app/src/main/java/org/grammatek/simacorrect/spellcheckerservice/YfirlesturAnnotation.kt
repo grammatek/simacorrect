@@ -17,6 +17,9 @@ class YfirlesturAnnotation(
     private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
     private val _originalText: String = response?.text ?: throw NullPointerException()
 ) {
+    val offsets = mutableListOf<Int>() // TODO: Experimental
+    val lengths = mutableListOf<Int>()
+
     /**
      * Creates a [Key] data class from the
      * annotation.start and annotation.end indexes.
@@ -58,6 +61,8 @@ class YfirlesturAnnotation(
                 }
             }
             if(suggestions.isNotEmpty()){
+                offsets.add(annotations[0].start!!)
+                lengths.add(annotations[0].endChar!!-annotations[0].startChar!! + 1)
                 // We assign the cookie to 0 and re-assign it upstream where we have access to it.
                 suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
             }
