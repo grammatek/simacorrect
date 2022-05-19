@@ -1,5 +1,6 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
+import android.os.Build
 import android.util.Log
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
@@ -47,7 +48,6 @@ class YfirlesturAnnotation(
                 }
                 sequence = getSequence(annotation.startChar!!, annotation.endChar!!)
                 flag = determineSuggestionFlag(annotation.code.toString())
-
                 val suggestion = correctSuggestion(
                     annotation.suggest.toString(), annotation.end!!-annotation.start!!
                 )
@@ -106,10 +106,11 @@ class YfirlesturAnnotation(
     private fun determineSuggestionFlag(code: String): Int {
         // TODO: GreynirCorrect contains all the annotation.codes but it's unclear which
         //  are grammar errors. However 'P_WRONG' covers a good amount of them, if not all.
-        return if (code.contains("P_WRONG")) {
+        return if (code.contains("P_WRONG") && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)) {
             SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
         } else {
-            // we can assume it's a typo if it's not a grammar error.
+            // we can assume it's a typo if it's not a grammar error or if running on a device with
+            // an older SDK that doesn't support the RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
             SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
         }
     }
