@@ -70,7 +70,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 val ylAnnotation = YfirlesturAnnotation(response)
                 suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
             } catch (e: Exception) {
-                Log.d(TAG, "onGetSuggestionsMultiple: Exception: $e")
+                Log.e(TAG, "onGetSuggestionsMultiple: Exception: $e")
                 return emptyArray()
             }
 

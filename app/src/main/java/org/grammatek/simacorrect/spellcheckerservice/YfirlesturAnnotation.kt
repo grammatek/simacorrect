@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
 import org.grammatek.models.YfirlesturResponse
+import java.lang.NullPointerException
 
 /**
  * Resolves Yfirlestur's response and constructs
@@ -12,11 +13,10 @@ import org.grammatek.models.YfirlesturResponse
  * @param [response] is the entire JSON response from Yfirlestur's API.
  */
 class YfirlesturAnnotation(
-    response: YfirlesturResponse?
+    response: YfirlesturResponse?,
+    private var _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
+    private val _originalText: String = response?.text ?: throw NullPointerException()
 ) {
-    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: emptyList()
-    private val _originalText: String = response?.text ?: ""
-
     /**
      * Creates a [Key] data class from the
      * annotation.start and annotation.end indexes.
