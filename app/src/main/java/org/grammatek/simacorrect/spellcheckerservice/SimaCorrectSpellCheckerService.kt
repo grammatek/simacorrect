@@ -67,16 +67,11 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             try {
                 val textToCorrect = textInfos.joinToString(separator = " ") { it.text }
                 val response = ConnectionManager.correctSentence(textToCorrect)
-                val annotation = response!!.result?.get(0)?.get(0)?.annotations ?: return arrayOf()
-                if (annotation.isEmpty()) {
-                    return arrayOf()
-                }
-
-                val ylAnnotation = YfirlesturAnnotation(annotation, response.text.toString())
+                val ylAnnotation = YfirlesturAnnotation(response)
                 suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
             } catch (e: Exception) {
-                Log.d(TAG, "Exception: $e")
-                return arrayOf()
+                Log.d(TAG, "onGetSuggestionsMultiple: Exception: $e")
+                return emptyArray()
             }
 
             for(sl in suggestionList) {
