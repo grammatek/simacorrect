@@ -14,7 +14,7 @@ import java.lang.NullPointerException
  */
 class YfirlesturAnnotation(
     response: YfirlesturResponse?,
-    private var _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
+    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
     private val _originalText: String = response?.text ?: throw NullPointerException()
 ) {
     /**
