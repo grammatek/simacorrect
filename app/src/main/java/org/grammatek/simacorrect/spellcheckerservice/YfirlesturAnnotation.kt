@@ -17,8 +17,12 @@ class YfirlesturAnnotation(
     private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
     private val _originalText: String = response?.text ?: throw NullPointerException()
 ) {
-    val offsets = mutableListOf<Int>() // TODO: Experimental
-    val lengths = mutableListOf<Int>()
+    val suggestionsIndexes: MutableList<SuggestionIndexes> = mutableListOf()
+
+    class SuggestionIndexes(
+        val startChar: Int,
+        val endChar: Int,
+    )
 
     /**
      * Creates a [Key] data class from the
@@ -43,6 +47,8 @@ class YfirlesturAnnotation(
         for((_, annotations) in annotationsList) {
             var flag = 0
             val suggestions = mutableListOf<String>()
+            var startChar = -1
+            var endChar = -1
             var sequence = 0
             for (annotation in annotations) {
                 if(annotation.suggest == null || annotation.code == null) {
@@ -57,14 +63,24 @@ class YfirlesturAnnotation(
                 // Avoid duplicate suggestions
                 if(!suggestions.contains(suggestion)) {
                     Log.d(TAG, "adding: $suggestion as a suggestion at index: ${annotation.start}")
+                    // Yfirlestur takes will identify whitespaces as start of annotation (while android does not)
+                    startChar = if (annotation.startChar!! != 0){
+                        annotation.startChar!! + 1
+                    } else {
+                        annotation.startChar!!
+                    }
+                    endChar = annotation.endChar!!
                     suggestions.add(suggestion)
                 }
             }
-            if(suggestions.isNotEmpty()){
-                offsets.add(annotations[0].start!!)
-                lengths.add(annotations[0].endChar!!-annotations[0].startChar!! + 1)
+            if(suggestions.isNotEmpty()) {
                 // We assign the cookie to 0 and re-assign it upstream where we have access to it.
                 suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
+                if(startChar >= 0 && endChar >= 0) {
+                    suggestionsIndexes.add(
+                        SuggestionIndexes(startChar, endChar)
+                    )
+                }
             }
         }
         return suggestionList
