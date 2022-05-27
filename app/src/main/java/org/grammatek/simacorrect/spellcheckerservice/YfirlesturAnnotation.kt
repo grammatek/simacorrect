@@ -18,11 +18,25 @@ class YfirlesturAnnotation(
     private val _originalText: String = response?.text ?: throw NullPointerException()
 ) {
     val suggestionsIndexes: MutableList<SuggestionIndexes> = mutableListOf()
+    // Credit to https://github.com/hinrikur/gc_wagtail for classifying spelling error codes
+    private val yfirlesturCodes: Map<String, String> = mapOf(
+        "C" to "grammar", // Compound error
+        "N" to "grammar", // Punctuation error - N
+        "P" to "grammar", // Phrase error - P
+        "W" to "grammar", // Spelling suggestion - W (not used in GreynirCorrect atm)
+        "Z" to "typo", // Capitalization error - Z
+        "A" to "typo", // Abbreviation - A
+        "S" to "typo", // Spelling error - S
+        "U" to "inactive", // Unknown word - U (nothing can be done)
+        "E" to "inactive" // Error in parsing step
+    )
 
     class SuggestionIndexes(
         val startChar: Int,
-        val endChar: Int,
-    )
+        endChar: Int,
+    ) {
+        var length: Int = endChar - startChar + 1
+    }
 
     /**
      * Creates a [Key] data class from the
@@ -41,47 +55,45 @@ class YfirlesturAnnotation(
      */
     fun getSuggestionsForAnnotatedWords(): List<SuggestionsInfo> {
         // Group annotations in a list that have the same start AND end index.
+        // Necessary to distinguish between cases where single word annotations
+        // are inside of multi word annotations.
         val annotationsList = _annotations.groupBy { it.toKey() }
         val suggestionList = mutableListOf<SuggestionsInfo>()
 
         for((_, annotations) in annotationsList) {
-            var flag = 0
             val suggestions = mutableListOf<String>()
-            var startChar = -1
-            var endChar = -1
+            var flag = 0
+            var startChar = 0
+            var endChar = 0
             var sequence = 0
             for (annotation in annotations) {
-                if(annotation.suggest == null || annotation.code == null) {
+                if(annotation.code == null) {
                     continue
                 }
                 sequence = getSequence(annotation.startChar!!, annotation.endChar!!)
                 flag = determineSuggestionFlag(annotation.code.toString())
 
-                val suggestion = correctSuggestion(
+                val suggestion: String = correctSuggestion(
                     annotation.suggest.toString(), annotation.end!!-annotation.start!!
                 )
-                // Avoid duplicate suggestions
-                if(!suggestions.contains(suggestion)) {
-                    Log.d(TAG, "adding: $suggestion as a suggestion at index: ${annotation.start}")
-                    // Yfirlestur takes will identify whitespaces as start of annotation (while android does not)
-                    startChar = if (annotation.startChar!! != 0){
-                        annotation.startChar!! + 1
-                    } else {
-                        annotation.startChar!!
-                    }
-                    endChar = annotation.endChar!!
+
+                Log.d(TAG, "adding: $suggestion as a suggestion at index: ${annotation.start}")
+                // Take into account that Yfirlestur includes whitespaces in their annotation
+                startChar = if (annotation.startChar!! != 0) {
+                    annotation.startChar!! + 1
+                } else {
+                    annotation.startChar!!
+                }
+                endChar = annotation.endChar!!
+                if (suggestion.isNotEmpty() && annotation.suggest != null) {
                     suggestions.add(suggestion)
                 }
             }
-            if(suggestions.isNotEmpty()) {
-                // We assign the cookie to 0 and re-assign it upstream where we have access to it.
-                suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
-                if(startChar >= 0 && endChar >= 0) {
-                    suggestionsIndexes.add(
-                        SuggestionIndexes(startChar, endChar)
-                    )
-                }
-            }
+            // We assign the cookie to 0 and re-assign it upstream where we have access to it.
+            suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
+            suggestionsIndexes.add(
+                SuggestionIndexes(startChar, endChar)
+            )
         }
         return suggestionList
     }
@@ -125,13 +137,21 @@ class YfirlesturAnnotation(
      * @return The type of spelling error
      */
     private fun determineSuggestionFlag(code: String): Int {
-        // TODO: GreynirCorrect contains all the annotation.codes but it's unclear which
-        //  are grammar errors. However 'P_WRONG' covers a good amount of them, if not all.
-        return if (code.contains("P_WRONG")) {
-            SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
-        } else {
-            // we can assume it's a typo if it's not a grammar error.
-            SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+        return when {
+            yfirlesturCodes[code[0].toString()] == "grammar" -> {
+                Log.d(TAG, "le code: ${code[0]}, ${yfirlesturCodes[code[0].toString()]}")
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
+            }
+            yfirlesturCodes[code[0].toString()] == "typo" -> {
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+            }
+            // Inactive are cases where we annotate but don't have suggestions.
+            yfirlesturCodes[code[0].toString()] == "inactive" -> {
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+            }
+            else -> {
+                0
+            }
         }
     }
 

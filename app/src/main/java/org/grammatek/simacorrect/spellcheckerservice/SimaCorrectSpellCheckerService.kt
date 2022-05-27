@@ -10,7 +10,6 @@ import android.view.textservice.SentenceSuggestionsInfo
 import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
 import org.grammatek.simacorrect.network.ConnectionManager
-import java.text.BreakIterator
 
 /**
  * Implements Simacorrect spell checking as a SpellCheckerService
@@ -63,46 +62,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             textInfos: Array<TextInfo?>,
             suggestionsLimit: Int, sequentialWords: Boolean
         ): Array<SuggestionsInfo> {
-            val suggestionList: Array<SuggestionsInfo>
-
-            try {
-                val textToCorrect = textInfos.joinToString(separator = " ") { it!!.text }
-                val response = ConnectionManager.correctSentence(textToCorrect)
-                val ylAnnotation = YfirlesturAnnotation(response)
-                suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
-                for(sl in suggestionList) {
-                    sl.setCookieAndSequence(textInfos[0]!!.cookie, sl.sequence)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "onGetSuggestionsMultiple: Exception: $e")
-                return emptyArray()
-            }
-            return suggestionList
-        }
-
-        private fun getSplitWords(originalTextInfo: TextInfo): SentenceTextInfoParams {
-            val cookie = originalTextInfo.cookie
-            val wordItems = ArrayList<SentenceWordItem>()
-            val source = originalTextInfo.text
-            val stringToExamine: String = originalTextInfo.text
-            val boundary = BreakIterator.getWordInstance()
-            boundary.setText(stringToExamine)
-
-            var idx = 0
-            while(boundary.next() != BreakIterator.DONE) {
-                val word = source.subSequence(idx, boundary.current())
-                // check if first character of string
-                if(Character.isLetterOrDigit(word[0])) {
-                    Log.d(TAG,"word: $word, idx: $idx, length: ${word.length}, bound: ${boundary.current()}")
-                    val ti = TextInfo(
-                        word, 0, word.length, cookie,
-                        word.hashCode()
-                    )
-                    wordItems.add(SentenceWordItem(ti, idx, boundary.current()))
-                }
-                idx = boundary.current()
-            }
-            return SentenceTextInfoParams(originalTextInfo, wordItems)
+            TODO("Not to be implemented")
         }
 
         override fun onGetSentenceSuggestionsMultiple(
@@ -115,28 +75,13 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             }
             val retval = arrayOfNulls<SentenceSuggestionsInfo>(textInfos.size)
             for (i in textInfos.indices) {
-                val textInfoParams = getSplitWords(textInfos[i])
-                val mItems: ArrayList<SentenceWordItem> = textInfoParams.mItems
-
-                val itemsSize = mItems.size
-                val splitTextInfos = arrayOfNulls<TextInfo>(itemsSize)
-                for (j in 0 until itemsSize) {
-                    splitTextInfos[j] = mItems[j].mTextInfo
-                }
-
-                // TODO: Using the information from onGetSuggestionsMultiple, we must change the "textInfoParams: SentenceTextInfoParams"
-
                 val suggestionList: Array<SuggestionsInfo>
                 val suggestionsIndexes: Array<YfirlesturAnnotation.SuggestionIndexes>
 
                 try {
-                    val textToCorrect = splitTextInfos.joinToString(separator = " ") { it!!.text }
-                    val response = ConnectionManager.correctSentence(textToCorrect)
+                    val response = ConnectionManager.correctSentence(textInfos[i].text)
                     val ylAnnotation = YfirlesturAnnotation(response)
                     suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
-                    for(sl in suggestionList) {
-                        sl.setCookieAndSequence(textInfos[0].cookie, sl.sequence)
-                    }
                     suggestionsIndexes = ylAnnotation.suggestionsIndexes.toTypedArray()
                 } catch (e: Exception) {
                     Log.e(TAG, "onGetSentenceSuggestionsMultiple: Exception: $e")
@@ -144,78 +89,43 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 }
 
                 retval[i] = reconstructSuggestions(
-                    textInfoParams,
                     suggestionList,
                     suggestionsIndexes,
+                    textInfos[i]
                 )
             }
             return retval
         }
 
         fun reconstructSuggestions(
-            originalTextInfoParams: SentenceTextInfoParams?,
             results: Array<SuggestionsInfo>,
             resultsIndexes: Array<YfirlesturAnnotation.SuggestionIndexes>,
+            originalTextInfo: TextInfo
         ): SentenceSuggestionsInfo? {
             if (results.isEmpty()) {
                 return null
             }
-            if (originalTextInfoParams == null) {
-                if (DBG) {
-                    Log.w(TAG, "Adapter: originalTextInfoParams is null.")
-                }
-                return null
-            }
-
-            val originalCookie = originalTextInfoParams.mOriginalTextInfo.cookie
-            val originalSequence = originalTextInfoParams.mOriginalTextInfo.sequence
-
             val offsets = IntArray(results.size)
             val lengths = IntArray(results.size)
             val reconstructedSuggestions = arrayOfNulls<SuggestionsInfo>(results.size)
 
             for (i in results.indices) {
                 offsets[i] = resultsIndexes[i].startChar
-                lengths[i] = resultsIndexes[i].endChar - resultsIndexes[i].startChar + 1 // TODO: add length to 'resultsIndexes'
+                lengths[i] = resultsIndexes[i].length
                 val result: SuggestionsInfo = results[i]
 
-                result.setCookieAndSequence(originalCookie, originalSequence)
+                result.setCookieAndSequence(originalTextInfo.cookie, originalTextInfo.sequence)
                 reconstructedSuggestions[i] = result
-                for(j in 0 until result.suggestionsCount) {
-                    Log.d(TAG, "suggestion[$j]: ${result.getSuggestionAt(j)}")
-                }
-                Log.d(TAG, "seq: ${results[i].sequence}, seq2 ${result.sequence}")
-                Log.d(TAG, "suggestion: ${result.getSuggestionAt(0)}, offset: ${offsets[i]}, length: ${lengths[i]}")
             }
             return SentenceSuggestionsInfo(reconstructedSuggestions, offsets, lengths)
         }
 
-        /**
-         * Container for originally queried TextInfo and parameters
-         */
-        class SentenceTextInfoParams(
-            val mOriginalTextInfo: TextInfo,
-            items: ArrayList<SentenceWordItem>
-        ) {
-            val mItems: ArrayList<SentenceWordItem> = items
-            val mSize: Int = items.size
-        }
-
-        class SentenceWordItem(
-            val mTextInfo: TextInfo,
-            val mStart: Int,
-            var end: Int
-        ) {
-            var mLength: Int = end - mStart
-        }
-
         override fun onGetSuggestions(textInfo: TextInfo?, suggestionsLimit: Int): SuggestionsInfo {
-            TODO("Not yet implemented")
+            TODO("Not to be implemented")
         }
 
         companion object {
             private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
-            private const val DBG = false
         }
     }
 }
