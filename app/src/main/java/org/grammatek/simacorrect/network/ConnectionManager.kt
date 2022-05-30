@@ -8,6 +8,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.util.Log
 import org.grammatek.apis.DevelopersApi
+import org.grammatek.models.YfirlesturResponse
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -128,30 +129,24 @@ class ConnectionManager {
             private set
 
         /**
-         * Returns the corrected spelling for [text] if successful. Returns an
-         * empty string if there is no correction to be made OR no connection.
+         * Returns the corrected spelling for [textToCorrect] if successful.
+         * Returns null if there is no correction to be made OR no connection.
          *
-         * @param [text] The text to be spell checked (corrected).
-         * @return Spell corrected text for [text].
+         * @param [textToCorrect] The text to be spell checked (corrected).
+         * @return YfirlesturResponse which contains the spell checking
+         * information of [textToCorrect].
          */
-        fun correctWord(text: String): String {
+        fun correctSentence(textToCorrect: String): YfirlesturResponse? {
             if(!g_isServiceReachable || !g_isNetworkConnected) {
-                Log.d(TAG, "correctWord: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
-                return ""
+                Log.d(TAG, "correctSentence: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
+                return null
             }
             try {
-                val response = API.correctApiPost(text)
-                val correctedText = response.result?.get(0)?.get(0)?.corrected?.lowercase()
-                    ?: throw NullPointerException("Received null value from response corrected text")
-                val originalText = response.result?.get(0)?.get(0)?.original?.lowercase()
-                    ?: throw NullPointerException("Received null value from response original text")
-                if(correctedText != originalText) {
-                    return correctedText
-                }
+                return API.correctApiPost(textToCorrect)
             } catch (e: Exception) {
-                Log.d(TAG, "Exception: ${e.message}")
+                Log.d(TAG, "Exception: $e")
             }
-            return ""
+            return null
         }
     }
 

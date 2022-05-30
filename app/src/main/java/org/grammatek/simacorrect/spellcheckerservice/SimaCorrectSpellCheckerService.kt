@@ -61,9 +61,23 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         override fun onGetSuggestionsMultiple(
             textInfos: Array<TextInfo>,
             suggestionsLimit: Int, sequentialWords: Boolean
-        ): Array<SuggestionsInfo?> {
-            Log.d(TAG, "onGetSuggestionsMultiple: ${textInfos.size}")
-            return super.onGetSuggestionsMultiple(textInfos, suggestionsLimit, sequentialWords)
+        ): Array<SuggestionsInfo> {
+            val suggestionList: Array<SuggestionsInfo>
+
+            try {
+                val textToCorrect = textInfos.joinToString(separator = " ") { it.text }
+                val response = ConnectionManager.correctSentence(textToCorrect)
+                val ylAnnotation = YfirlesturAnnotation(response)
+                suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
+            } catch (e: Exception) {
+                Log.e(TAG, "onGetSuggestionsMultiple: Exception: $e")
+                return emptyArray()
+            }
+
+            for(sl in suggestionList) {
+                sl.setCookieAndSequence(textInfos[0].cookie, sl.sequence)
+            }
+            return suggestionList
         }
 
         override fun onGetSentenceSuggestionsMultiple(
@@ -74,31 +88,8 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             return super.onGetSentenceSuggestionsMultiple(textInfos, suggestionsLimit)
         }
 
-        /**
-         * Fetches spell checking suggestions.
-         *
-         * @param [textInfo] contains the text that this method fetches suggestions for.
-         * @param [suggestionsLimit] the limit of suggestions given.
-         * @return [SuggestionsInfo]
-         */
-        override fun onGetSuggestions(textInfo: TextInfo, suggestionsLimit: Int): SuggestionsInfo {
-            Log.d(TAG, "onGetSuggestions: " + textInfo.text)
-            // The API we're calling returns a value with the first letter in uppercase and since we're
-            // calling it for each word we need to compare the original word with the first char in uppercase
-            // against the corrected word.
-            var flags = 0
-            val suggestions = mutableListOf<String>()
-            if(_userDict.contains(textInfo.text)) {
-                flags = SuggestionsInfo.RESULT_ATTR_IN_THE_DICTIONARY
-            }
-            else {
-                val correctedWord = ConnectionManager.correctWord(textInfo.text)
-                if(correctedWord != "") {
-                    flags = SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
-                    suggestions.add(correctedWord)
-                }
-            }
-            return SuggestionsInfo(flags, suggestions.toTypedArray(), textInfo.cookie, textInfo.sequence)
+        override fun onGetSuggestions(textInfo: TextInfo?, suggestionsLimit: Int): SuggestionsInfo {
+            TODO("Not yet implemented")
         }
 
         companion object {
