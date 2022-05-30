@@ -1,5 +1,6 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
+import android.os.Build
 import android.util.Log
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
@@ -14,8 +15,8 @@ import java.lang.NullPointerException
  */
 class YfirlesturAnnotation(
     response: YfirlesturResponse?,
-    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
-    private val _originalText: String = response?.text ?: throw NullPointerException()
+    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException("annotations null"),
+    private val _originalText: String = response?.text ?: throw NullPointerException("original text null")
 ) {
     val suggestionsIndexes: MutableList<SuggestionIndexes> = mutableListOf()
     // Credit to https://github.com/hinrikur/gc_wagtail for classifying spelling error codes
@@ -31,6 +32,10 @@ class YfirlesturAnnotation(
         "E" to "inactive" // Error in parsing step
     )
 
+    /**
+     * For storing the starting index, end index and length for all annotations.
+     * Used by the spell checker service to determine where to place annotations.
+     */
     class SuggestionIndexes(
         val startChar: Int,
         endChar: Int,
@@ -74,7 +79,7 @@ class YfirlesturAnnotation(
                 flag = determineSuggestionFlag(annotation.code.toString())
 
                 val suggestion: String = correctSuggestion(
-                    annotation.suggest.toString(), annotation.end!!-annotation.start!!
+                    annotation.suggest ?: "", annotation.end!!-annotation.start!!
                 )
 
                 Log.d(TAG, "adding: $suggestion as a suggestion at index: ${annotation.start}")
@@ -122,6 +127,9 @@ class YfirlesturAnnotation(
         // suggestion are meant to ACTUALLY be suggested. This is due to Yfirlestur's
         // way of recommending for multiple word annotation for grammar errors.
         // See https://github.com/mideind/Yfirlestur/issues/7 for clarity.
+        if(suggestion == "") {
+            return suggestion
+        }
         val suggestionSplitIntoWords = suggestion.trim().split(" ").toMutableList()
         var validatedSuggestion = ""
         for(i in 0 until length + 1) {
@@ -137,9 +145,10 @@ class YfirlesturAnnotation(
      * @return The type of spelling error
      */
     private fun determineSuggestionFlag(code: String): Int {
+        // First character of the code indicates which type of error.
         return when {
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) &&
             yfirlesturCodes[code[0].toString()] == "grammar" -> {
-                Log.d(TAG, "le code: ${code[0]}, ${yfirlesturCodes[code[0].toString()]}")
                 SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
             }
             yfirlesturCodes[code[0].toString()] == "typo" -> {
@@ -150,7 +159,7 @@ class YfirlesturAnnotation(
                 SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
             }
             else -> {
-                0
+                0 // do nothing
             }
         }
     }

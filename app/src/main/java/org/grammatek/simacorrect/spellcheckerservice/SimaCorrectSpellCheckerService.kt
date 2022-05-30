@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.textservice.SentenceSuggestionsInfo
 import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
+import org.grammatek.models.YfirlesturResponse
 import org.grammatek.simacorrect.network.ConnectionManager
 
 /**
@@ -84,7 +85,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                     suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
                     suggestionsIndexes = ylAnnotation.suggestionsIndexes.toTypedArray()
                 } catch (e: Exception) {
-                    Log.e(TAG, "onGetSentenceSuggestionsMultiple: Exception: $e")
+                    Log.e(TAG, "onGetSentenceSuggestionsMultiple: ${e.message} ${e.stackTrace.joinToString("\n")}")
                     return emptyArray()
                 }
 
@@ -113,7 +114,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 offsets[i] = resultsIndexes[i].startChar
                 lengths[i] = resultsIndexes[i].length
                 val result: SuggestionsInfo = results[i]
-
                 result.setCookieAndSequence(originalTextInfo.cookie, originalTextInfo.sequence)
                 reconstructedSuggestions[i] = result
             }
