@@ -1,6 +1,12 @@
 # Simacorrect
 
-This project provides an Icelandic spell checker service for android.
+## Introduction
+
+Simacorrect is a spell checker that provides spell and grammar correction for Icelandic on Android devices.
+Spell checking is made via API calls by utilizing the web service [Yfirlestur](https://github.com/mideind/), which  wraps the spelling and grammar checking engine
+[GreynirCorrect](https://github.com/mideind/GreynirCorrect)
+
+Simacorrect is available on the Google Play Store.
 <p align="left">
     <a href="https://play.google.com/">
         <img alt="Get it on Google Play"
@@ -9,13 +15,10 @@ This project provides an Icelandic spell checker service for android.
     </a>
 </p>
 
-## Introduction
-TODO:
-
 ## Features
-- #### Supports correction for grammar errors for android version 12.0 and higher
-    - This covers grammar, compound, punctuation and phrasing errors as well as spelling suggestions based on context.
-- #### Correction for spelling errors
+- #### Supports correction for grammar errors for android version 12.0 and higher (blue annotation)
+    - This covers grammar, compound, punctuation and phrasing errors as well as spelling suggestions.
+- #### Correction for spelling errors (red annotation)
     - This covers spelling, capitalization and abbreviation errors.
 
 ## Screenshots
@@ -36,8 +39,15 @@ You can contribute to this project by forking it, creating a branch and opening 
 
 ## License
 
-All new code is Copyright © 2022 Grammatek ehf and licensed under the [Apache License](LICENSE).
+Copyright © 2022 Grammatek ehf.
 
-This software is developed under the auspices of the Icelandic Government 5-Year Language Technology Program, described
-[here](https://www.stjornarradid.is/lisalib/getfile.aspx?itemid=56f6368e-54f0-11e7-941a-005056bc530c) and
-[here](https://clarin.is/media/uploads/mlt-en.pdf) (English).
+
+This software is developed under the auspices of the Icelandic Government 5-Year Language Technology Program, described in
+[Icelandic](https://www.stjornarradid.is/lisalib/getfile.aspx?itemid=56f6368e-54f0-11e7-941a-005056bc530c) and
+[English](https://clarin.is/media/uploads/mlt-en.pdf)
+
+This software is licensed under the [Apache License](LICENSE)
+
+## Acknowledgements
+https://github.com/hinrikur/gc_wagtail
+
