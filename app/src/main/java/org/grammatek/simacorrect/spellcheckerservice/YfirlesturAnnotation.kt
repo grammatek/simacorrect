@@ -1,7 +1,6 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
 import android.os.Build
-import android.util.Log
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
 import org.grammatek.models.YfirlesturResponse
@@ -58,7 +57,7 @@ class YfirlesturAnnotation(
      *
      * @returns List<SuggestionsInfo>
      */
-    fun getSuggestionsForAnnotatedWords(): List<SuggestionsInfo> {
+    fun getSuggestionsForAnnotatedWords(suggestionsLimit: Int): List<SuggestionsInfo> {
         // Group annotations in a list that have the same start AND end index.
         // Necessary to distinguish between cases where single word annotations
         // are inside of multi word annotations.
@@ -82,7 +81,6 @@ class YfirlesturAnnotation(
                     annotation.suggest ?: "", annotation.end!!-annotation.start!!
                 )
 
-                Log.d(TAG, "adding: $suggestion as a suggestion at index: ${annotation.start}")
                 // Take into account that Yfirlestur includes whitespaces in their annotation
                 startChar = if (annotation.startChar!! != 0) {
                     annotation.startChar!! + 1
@@ -90,7 +88,7 @@ class YfirlesturAnnotation(
                     annotation.startChar!!
                 }
                 endChar = annotation.endChar!!
-                if (suggestion.isNotEmpty() && annotation.suggest != null) {
+                if (suggestion.isNotEmpty() && annotation.suggest != null && suggestions.size <= suggestionsLimit) {
                     suggestions.add(suggestion)
                 }
             }

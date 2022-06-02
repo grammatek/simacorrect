@@ -82,7 +82,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 try {
                     val response = ConnectionManager.correctSentence(textInfos[i].text)
                     val ylAnnotation = YfirlesturAnnotation(response)
-                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
+                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit).toTypedArray()
                     suggestionsIndexes = ylAnnotation.suggestionsIndexes.toTypedArray()
                 } catch (e: Exception) {
                     Log.e(TAG, "onGetSentenceSuggestionsMultiple: ${e.message} ${e.stackTrace.joinToString("\n")}")
