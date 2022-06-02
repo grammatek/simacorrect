@@ -1,7 +1,6 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
 import android.os.Build
-import android.util.Log
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
 import org.grammatek.models.YfirlesturResponse
@@ -15,9 +14,34 @@ import java.lang.NullPointerException
  */
 class YfirlesturAnnotation(
     response: YfirlesturResponse?,
-    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException(),
-    private val _originalText: String = response?.text ?: throw NullPointerException()
+    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException("annotations null"),
+    private val _originalText: String = response?.text ?: throw NullPointerException("original text null")
 ) {
+    val suggestionsIndexes: MutableList<SuggestionIndexes> = mutableListOf()
+    // Credit to https://github.com/hinrikur/gc_wagtail for classifying spelling error codes
+    private val yfirlesturCodes: Map<String, String> = mapOf(
+        "C" to "grammar", // Compound error
+        "N" to "grammar", // Punctuation error - N
+        "P" to "grammar", // Phrase error - P
+        "W" to "grammar", // Spelling suggestion - W (not used in GreynirCorrect atm)
+        "Z" to "typo", // Capitalization error - Z
+        "A" to "typo", // Abbreviation - A
+        "S" to "typo", // Spelling error - S
+        "U" to "inactive", // Unknown word - U (nothing can be done)
+        "E" to "inactive" // Error in parsing step
+    )
+
+    /**
+     * For storing the starting index, end index and length for all annotations.
+     * Used by the spell checker service to determine where to place annotations.
+     */
+    class SuggestionIndexes(
+        val startChar: Int,
+        endChar: Int,
+    ) {
+        var length: Int = endChar - startChar + 1
+    }
+
     /**
      * Creates a [Key] data class from the
      * annotation.start and annotation.end indexes.
@@ -33,34 +57,46 @@ class YfirlesturAnnotation(
      *
      * @returns List<SuggestionsInfo>
      */
-    fun getSuggestionsForAnnotatedWords(): List<SuggestionsInfo> {
+    fun getSuggestionsForAnnotatedWords(suggestionsLimit: Int): List<SuggestionsInfo> {
         // Group annotations in a list that have the same start AND end index.
+        // Necessary to distinguish between cases where single word annotations
+        // are inside of multi word annotations.
         val annotationsList = _annotations.groupBy { it.toKey() }
         val suggestionList = mutableListOf<SuggestionsInfo>()
 
         for((_, annotations) in annotationsList) {
-            var flag = 0
             val suggestions = mutableListOf<String>()
+            var flag = 0
+            var startChar = 0
+            var endChar = 0
             var sequence = 0
             for (annotation in annotations) {
-                if(annotation.suggest == null || annotation.code == null) {
+                if(annotation.code == null) {
                     continue
                 }
                 sequence = getSequence(annotation.startChar!!, annotation.endChar!!)
                 flag = determineSuggestionFlag(annotation.code.toString())
-                val suggestion = correctSuggestion(
-                    annotation.suggest.toString(), annotation.end!!-annotation.start!!
+
+                val suggestion: String = correctSuggestion(
+                    annotation.suggest ?: "", annotation.end!!-annotation.start!!
                 )
-                // Avoid duplicate suggestions
-                if(!suggestions.contains(suggestion)) {
-                    Log.d(TAG, "adding: $suggestion as a suggestion at index: ${annotation.start}")
+
+                // Take into account that Yfirlestur includes whitespaces in their annotation
+                startChar = if (annotation.startChar!! != 0) {
+                    annotation.startChar!! + 1
+                } else {
+                    annotation.startChar!!
+                }
+                endChar = annotation.endChar!!
+                if (suggestion.isNotEmpty() && annotation.suggest != null && suggestions.size <= suggestionsLimit) {
                     suggestions.add(suggestion)
                 }
             }
-            if(suggestions.isNotEmpty()){
-                // We assign the cookie to 0 and re-assign it upstream where we have access to it.
-                suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
-            }
+            // We assign the cookie to 0 and re-assign it upstream where we have access to it.
+            suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
+            suggestionsIndexes.add(
+                SuggestionIndexes(startChar, endChar)
+            )
         }
         return suggestionList
     }
@@ -89,6 +125,9 @@ class YfirlesturAnnotation(
         // suggestion are meant to ACTUALLY be suggested. This is due to Yfirlestur's
         // way of recommending for multiple word annotation for grammar errors.
         // See https://github.com/mideind/Yfirlestur/issues/7 for clarity.
+        if(suggestion == "") {
+            return suggestion
+        }
         val suggestionSplitIntoWords = suggestion.trim().split(" ").toMutableList()
         var validatedSuggestion = ""
         for(i in 0 until length + 1) {
@@ -104,14 +143,22 @@ class YfirlesturAnnotation(
      * @return The type of spelling error
      */
     private fun determineSuggestionFlag(code: String): Int {
-        // TODO: GreynirCorrect contains all the annotation.codes but it's unclear which
-        //  are grammar errors. However 'P_WRONG' covers a good amount of them, if not all.
-        return if (code.contains("P_WRONG") && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)) {
-            SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
-        } else {
-            // we can assume it's a typo if it's not a grammar error or if running on a device with
-            // an older SDK that doesn't support the RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
-            SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+        // First character of the code indicates which type of error.
+        return when {
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) &&
+            yfirlesturCodes[code[0].toString()] == "grammar" -> {
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_GRAMMAR_ERROR
+            }
+            yfirlesturCodes[code[0].toString()] == "typo" -> {
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+            }
+            // Inactive are cases where we annotate but don't have suggestions.
+            yfirlesturCodes[code[0].toString()] == "inactive" -> {
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
+            }
+            else -> {
+                0 // do nothing
+            }
         }
     }
 

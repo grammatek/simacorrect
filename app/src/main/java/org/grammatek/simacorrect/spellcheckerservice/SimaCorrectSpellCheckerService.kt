@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.textservice.SentenceSuggestionsInfo
 import android.view.textservice.SuggestionsInfo
 import android.view.textservice.TextInfo
+import org.grammatek.models.YfirlesturResponse
 import org.grammatek.simacorrect.network.ConnectionManager
 
 /**
@@ -59,37 +60,68 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         }
 
         override fun onGetSuggestionsMultiple(
-            textInfos: Array<TextInfo>,
+            textInfos: Array<TextInfo?>,
             suggestionsLimit: Int, sequentialWords: Boolean
         ): Array<SuggestionsInfo> {
-            val suggestionList: Array<SuggestionsInfo>
-
-            try {
-                val textToCorrect = textInfos.joinToString(separator = " ") { it.text }
-                val response = ConnectionManager.correctSentence(textToCorrect)
-                val ylAnnotation = YfirlesturAnnotation(response)
-                suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords().toTypedArray()
-            } catch (e: Exception) {
-                Log.e(TAG, "onGetSuggestionsMultiple: Exception: $e")
-                return emptyArray()
-            }
-
-            for(sl in suggestionList) {
-                sl.setCookieAndSequence(textInfos[0].cookie, sl.sequence)
-            }
-            return suggestionList
+            TODO("Not to be implemented")
         }
 
         override fun onGetSentenceSuggestionsMultiple(
             textInfos: Array<out TextInfo>?,
             suggestionsLimit: Int,
-        ): Array<SentenceSuggestionsInfo> {
+        ): Array<SentenceSuggestionsInfo?> {
             Log.d(TAG, "onGetSentenceSuggestionsMultiple: ${textInfos?.size}")
-            return super.onGetSentenceSuggestionsMultiple(textInfos, suggestionsLimit)
+            if(textInfos == null || textInfos.isEmpty()) {
+                return emptyArray()
+            }
+            val retval = arrayOfNulls<SentenceSuggestionsInfo>(textInfos.size)
+            for (i in textInfos.indices) {
+                val suggestionList: Array<SuggestionsInfo>
+                val suggestionsIndexes: Array<YfirlesturAnnotation.SuggestionIndexes>
+
+                try {
+                    val response = ConnectionManager.correctSentence(textInfos[i].text)
+                    val ylAnnotation = YfirlesturAnnotation(response)
+                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit).toTypedArray()
+                    suggestionsIndexes = ylAnnotation.suggestionsIndexes.toTypedArray()
+                } catch (e: Exception) {
+                    Log.e(TAG, "onGetSentenceSuggestionsMultiple: ${e.message} ${e.stackTrace.joinToString("\n")}")
+                    return emptyArray()
+                }
+
+                retval[i] = reconstructSuggestions(
+                    suggestionList,
+                    suggestionsIndexes,
+                    textInfos[i]
+                )
+            }
+            return retval
+        }
+
+        fun reconstructSuggestions(
+            results: Array<SuggestionsInfo>,
+            resultsIndexes: Array<YfirlesturAnnotation.SuggestionIndexes>,
+            originalTextInfo: TextInfo
+        ): SentenceSuggestionsInfo? {
+            if (results.isEmpty()) {
+                return null
+            }
+            val offsets = IntArray(results.size)
+            val lengths = IntArray(results.size)
+            val reconstructedSuggestions = arrayOfNulls<SuggestionsInfo>(results.size)
+
+            for (i in results.indices) {
+                offsets[i] = resultsIndexes[i].startChar
+                lengths[i] = resultsIndexes[i].length
+                val result: SuggestionsInfo = results[i]
+                result.setCookieAndSequence(originalTextInfo.cookie, originalTextInfo.sequence)
+                reconstructedSuggestions[i] = result
+            }
+            return SentenceSuggestionsInfo(reconstructedSuggestions, offsets, lengths)
         }
 
         override fun onGetSuggestions(textInfo: TextInfo?, suggestionsLimit: Int): SuggestionsInfo {
-            TODO("Not yet implemented")
+            TODO("Not to be implemented")
         }
 
         companion object {

@@ -9,6 +9,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import java.math.BigDecimal
 
+@kotlinx.serialization.ExperimentalSerializationApi
 @Serializer(forClass = BigDecimal::class)
 object BigDecimalAdapter : KSerializer<BigDecimal> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BigDecimal", PrimitiveKind.STRING)
