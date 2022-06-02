@@ -16,7 +16,7 @@ Simacorrect is available on the Google Play Store.
 </p>
 
 ## Features
-- #### Supports correction for grammar errors for android version 12.0 and higher (blue annotation)
+- #### Supports correction for grammatical errors for Android version 12.0 and higher (blue annotation)
     - This covers grammar, compound, punctuation and phrasing errors as well as spelling suggestions.
 - #### Correction for spelling errors (red annotation)
     - This covers spelling, capitalization and abbreviation errors.
