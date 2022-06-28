@@ -6,14 +6,7 @@ Simacorrect is a spell checker that provides spell and grammar correction for Ic
 Spell checking is made via API calls by utilizing the web service [Yfirlestur](https://github.com/mideind/), which  wraps the spelling and grammar checking engine
 [GreynirCorrect](https://github.com/mideind/GreynirCorrect)
 
-Simacorrect is available on the Google Play Store.
-<p align="left">
-    <a href="https://play.google.com/">
-        <img alt="Get it on Google Play"
-            height="80"
-            src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
-    </a>
-</p>
+Simacorrect is currently in closed beta but will be available on the Google Play Store in the near future.
 
 ## Features
 - #### Supports correction for grammatical errors for Android version 12.0 and higher (blue annotation)
