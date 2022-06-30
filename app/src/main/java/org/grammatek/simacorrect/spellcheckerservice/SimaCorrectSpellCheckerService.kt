@@ -6,10 +6,7 @@ import android.database.Cursor
 import android.provider.UserDictionary.Words
 import android.service.textservice.SpellCheckerService
 import android.util.Log
-import android.view.textservice.SentenceSuggestionsInfo
-import android.view.textservice.SuggestionsInfo
-import android.view.textservice.TextInfo
-import org.grammatek.models.YfirlesturResponse
+import android.view.textservice.*
 import org.grammatek.simacorrect.network.ConnectionManager
 
 /**
@@ -38,7 +35,8 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                         Log.d(TAG, "Observed changes in user dictionary")
                         loadUserDictionary()
                     }
-                })
+                }
+            )
         }
 
         /**
@@ -77,13 +75,21 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             val retval = arrayOfNulls<SentenceSuggestionsInfo>(textInfos.size)
             for (i in textInfos.indices) {
                 val suggestionList: Array<SuggestionsInfo>
-                val suggestionsIndexes: Array<YfirlesturAnnotation.SuggestionIndexes>
-
+                val suggestionsIndices: Array<YfirlesturAnnotation.AnnotationIndices>
                 try {
-                    val response = ConnectionManager.correctSentence(textInfos[i].text)
-                    val ylAnnotation = YfirlesturAnnotation(response)
-                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit).toTypedArray()
-                    suggestionsIndexes = ylAnnotation.suggestionsIndexes.toTypedArray()
+                    var text = textInfos[i].text!!
+                    if (text.isBlank()) {
+                        continue
+                    }
+                    if (text.trim()[0].isLowerCase()) {
+                        val index = text.indexOf(text.trim())
+                        text = StringBuilder(text).also { it[index] = text.trim()[0].uppercaseChar() }.toString()
+                    }
+
+                    val response = ConnectionManager.correctSentence(text)
+                    val ylAnnotation = YfirlesturAnnotation(response, textInfos[i].text)
+                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit, _userDict).toTypedArray()
+                    suggestionsIndices = ylAnnotation.suggestionsIndices.toTypedArray()
                 } catch (e: Exception) {
                     Log.e(TAG, "onGetSentenceSuggestionsMultiple: ${e.message} ${e.stackTrace.joinToString("\n")}")
                     return emptyArray()
@@ -91,7 +97,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
                 retval[i] = reconstructSuggestions(
                     suggestionList,
-                    suggestionsIndexes,
+                    suggestionsIndices,
                     textInfos[i]
                 )
             }
@@ -100,22 +106,26 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
         fun reconstructSuggestions(
             results: Array<SuggestionsInfo>,
-            resultsIndexes: Array<YfirlesturAnnotation.SuggestionIndexes>,
+            resultsIndices: Array<YfirlesturAnnotation.AnnotationIndices>,
             originalTextInfo: TextInfo
         ): SentenceSuggestionsInfo? {
-            if (results.isEmpty()) {
+            if (results.isEmpty() || originalTextInfo.text.isEmpty()) {
                 return null
             }
             val offsets = IntArray(results.size)
             val lengths = IntArray(results.size)
             val reconstructedSuggestions = arrayOfNulls<SuggestionsInfo>(results.size)
-
             for (i in results.indices) {
-                offsets[i] = resultsIndexes[i].startChar
-                lengths[i] = resultsIndexes[i].length
+                offsets[i] = resultsIndices[i].startChar
+                lengths[i] = resultsIndices[i].length
                 val result: SuggestionsInfo = results[i]
-                result.setCookieAndSequence(originalTextInfo.cookie, originalTextInfo.sequence)
-                reconstructedSuggestions[i] = result
+
+                if (result.suggestionsCount == 0) {
+                    reconstructedSuggestions[i] = SuggestionsInfo(0, null)
+                } else {
+                    reconstructedSuggestions[i] = result
+                    result.setCookieAndSequence(originalTextInfo.cookie, originalTextInfo.sequence)
+                }
             }
             return SentenceSuggestionsInfo(reconstructedSuggestions, offsets, lengths)
         }
