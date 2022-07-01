@@ -4,6 +4,7 @@ import android.os.Build
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
 import org.grammatek.models.YfirlesturResponse
+import java.lang.Exception
 import java.lang.NullPointerException
 
 /**
@@ -14,10 +15,14 @@ import java.lang.NullPointerException
  */
 class YfirlesturAnnotation(
     response: YfirlesturResponse?,
-    private val _annotations: List<Annotations> = response?.result?.get(0)?.get(0)?.annotations ?: throw NullPointerException("annotations null"),
-    private val _originalText: String = response?.text ?: throw NullPointerException("original text null")
+    text: String?,
+    _response: YfirlesturResponse? = response,
+    _originalText: String = response?.text ?: throw NullPointerException("original text null"),
+    private val _unalteredOriginalText: String? = text
 ) {
-    val suggestionsIndexes: MutableList<SuggestionIndexes> = mutableListOf()
+    private val _annotations: List<List<Annotations>>
+    val suggestionsIndices: MutableList<AnnotationIndices> = mutableListOf()
+    val tokensIndices: MutableList<MutableList<AnnotationIndices>> = mutableListOf()
     // Credit to https://github.com/hinrikur/gc_wagtail for classifying spelling error codes
     private val yfirlesturCodes: Map<String, String> = mapOf(
         "C" to "grammar", // Compound error
@@ -35,16 +40,16 @@ class YfirlesturAnnotation(
      * For storing the starting index, end index and length for all annotations.
      * Used by the spell checker service to determine where to place annotations.
      */
-    class SuggestionIndexes(
+    class AnnotationIndices (
         val startChar: Int,
-        endChar: Int,
+        val endChar: Int,
     ) {
         var length: Int = endChar - startChar + 1
     }
 
     /**
      * Creates a [Key] data class from the
-     * annotation.start and annotation.end indexes.
+     * annotation.start and annotation.end indices.
      * Used to identify which annotations belong together.
      */
     private fun Annotations.toKey() = Key(start, end)
@@ -52,88 +57,92 @@ class YfirlesturAnnotation(
 
     /**
      * Iterates through all the [_annotations] and builds
-     * a [SuggestionsInfo] using data in the [_annotations] as
+     * a list of [SuggestionsInfo] using the data in the [_annotations] as
      * well as determining the type of spelling error.
      *
      * @returns List<SuggestionsInfo>
      */
-    fun getSuggestionsForAnnotatedWords(suggestionsLimit: Int): List<SuggestionsInfo> {
-        // Group annotations in a list that have the same start AND end index.
-        // Necessary to distinguish between cases where single word annotations
-        // are inside of multi word annotations.
-        val annotationsList = _annotations.groupBy { it.toKey() }
+    fun getSuggestionsForAnnotatedWords(suggestionsLimit: Int, dict: ArrayList<String>): List<SuggestionsInfo> {
         val suggestionList = mutableListOf<SuggestionsInfo>()
+        for (i in _annotations.indices) {
+            // Group annotations in a list that have the same start AND end index.
+            // Necessary to distinguish between cases where single word annotations
+            // are inside of multi word annotations.
+            val sentenceAnnotations = _annotations[i].groupBy { it.toKey() }
+            for((_, tokenAnnotations) in sentenceAnnotations) {
+                val suggestions = mutableListOf<String>()
+                val flags = mutableListOf<Int>()
+                var startChar = 0
+                var endChar = 0
 
-        for((_, annotations) in annotationsList) {
-            val suggestions = mutableListOf<String>()
-            var flag = 0
-            var startChar = 0
-            var endChar = 0
-            var sequence = 0
-            for (annotation in annotations) {
-                if(annotation.code == null) {
-                    continue
+                for (annotation in tokenAnnotations) {
+                    val startCharIndexedForUnalteredText = tokensIndices[i][annotation.start!!].startChar
+                    val endCharIndexedForUnalteredText = tokensIndices[i][annotation.end!!].endChar
+                    val word = _unalteredOriginalText!!.substring(startCharIndexedForUnalteredText, endCharIndexedForUnalteredText + 1)
+                    if(annotation.code == null || dict.contains(word)) {
+                        continue
+                    }
+
+                    val flag = determineSuggestionFlag(annotation.code.toString())
+                    if(flag == 0) {
+                        continue
+                    }
+                    flags.add(flag)
+
+                    var suggestion = annotation.suggest
+                    val annotationTokenStartIndex = annotation.start!!
+                    var annotationTokenEndIndex = annotation.end!!
+                    // if words are split up we have to fix the indexing from Yfirlestur
+                    // the method called tries to determine if that is the case.
+                    if ((annotation.start != annotation.end) && annotation.suggest != null) {
+                        annotationTokenEndIndex = adjustTokenIndices(annotation.text!!, annotation.start!!, annotation.end!!, i)
+                    }
+
+                    startChar = tokensIndices[i][annotationTokenStartIndex].startChar
+                    endChar = tokensIndices[i][annotationTokenEndIndex].endChar
+                    if (suggestions.size < suggestionsLimit && suggestion != null) {
+                        if (annotation.start == 0 && _unalteredOriginalText[startChar].isLowerCase()) {
+                            suggestion = suggestion.replaceFirstChar { it.lowercaseChar() }
+                        }
+                        suggestions.add(suggestion)
+                    }
                 }
-                sequence = getSequence(annotation.startChar!!, annotation.endChar!!)
-                flag = determineSuggestionFlag(annotation.code.toString())
-
-                val suggestion: String = correctSuggestion(
-                    annotation.suggest ?: "", annotation.end!!-annotation.start!!
-                )
-
-                // Take into account that Yfirlestur includes whitespaces in their annotation
-                startChar = if (annotation.startChar!! != 0) {
-                    annotation.startChar!! + 1
-                } else {
-                    annotation.startChar!!
-                }
-                endChar = annotation.endChar!!
-                if (suggestion.isNotEmpty() && annotation.suggest != null && suggestions.size <= suggestionsLimit) {
-                    suggestions.add(suggestion)
+                if(flags.isNotEmpty()) {
+                    val flag = flags.distinct().sum()
+                    suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray()))
+                    suggestionsIndices.add(
+                        AnnotationIndices(startChar, endChar)
+                    )
                 }
             }
-            // We assign the cookie to 0 and re-assign it upstream where we have access to it.
-            suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray(), 0, sequence))
-            suggestionsIndexes.add(
-                SuggestionIndexes(startChar, endChar)
-            )
         }
         return suggestionList
     }
 
     /**
-     * Finds the character sequence for given start and end index.
+     * Determines if an annotation has correct token indices
+     * and tries to correct them.
      *
-     * @param startChar
-     * @param endChar
-     * @return The character sequence hashed.
+     * @param text
+     * @param startIndex
+     * @param endIndex
+     * @return Int
      */
-    private fun getSequence(startChar: Int, endChar: Int): Int {
-        val sequenceString = _originalText.substring(startChar, endChar+1).trim()
-        return sequenceString.hashCode()
-    }
+    private fun adjustTokenIndices(text: String, startIndex: Int, endIndex: Int, sentenceIndex: Int): Int {
+        // Yfirlestur annotations have few cases where the token span is wrong.
+        // This only happens when Yfirlestur suggests a word be split into two.
+        // See https://github.com/mideind/Yfirlestur/issues/11 for more details.
+        val pattern = Regex("""'[^']*'""")
+        val realSuggestion = pattern.find(text)!!.value.replace("'", "")
 
-    /**
-     * Corrects the suggestion if deemed incorrect.
-     *
-     * @param suggestion The suggestion provided by Yfirlestur
-     * @param length The character length of the suggestion
-     * @return The part of the [suggestion] which we evaluate to be correct
-     */
-    private fun correctSuggestion(suggestion: String, length: Int): String {
-        // Split suggestion into tokens (words) to help determine which words of the
-        // suggestion are meant to ACTUALLY be suggested. This is due to Yfirlestur's
-        // way of recommending for multiple word annotation for grammar errors.
-        // See https://github.com/mideind/Yfirlestur/issues/7 for clarity.
-        if(suggestion == "") {
-            return suggestion
+        val one = tokensIndices[sentenceIndex][startIndex].startChar
+        val two = tokensIndices[sentenceIndex][startIndex].endChar + 1
+
+        return if (realSuggestion.lowercase() == _unalteredOriginalText!!.substring(one, two).lowercase()){
+            startIndex
+        } else {
+            endIndex
         }
-        val suggestionSplitIntoWords = suggestion.trim().split(" ").toMutableList()
-        var validatedSuggestion = ""
-        for(i in 0 until length + 1) {
-            validatedSuggestion += "${suggestionSplitIntoWords[i]} "
-        }
-        return validatedSuggestion.trim()
     }
 
     /**
@@ -157,12 +166,58 @@ class YfirlesturAnnotation(
                 SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
             }
             else -> {
-                0 // do nothing
+                // If we don't recognize a code we still want to annotate it.
+                SuggestionsInfo.RESULT_ATTR_LOOKS_LIKE_TYPO
             }
         }
     }
 
-    companion object {
-        private val TAG = YfirlesturAnnotation::class.java.simpleName
+    init {
+        // Find which first N characters get trimmed by Yfirlestur.
+        val indexOfFirstCharacter = _unalteredOriginalText!!.lowercase().indexOf(_originalText.lowercase())
+        if (indexOfFirstCharacter < 0) {
+            throw Exception("input text and yfirlestur text differ")
+        }
+
+        // Group annotations by sentence
+        val annotationList: ArrayList<List<Annotations>> = arrayListOf()
+        for (results in _response?.result!!) {
+            for (r in results) {
+                val annotations = arrayListOf<Annotations>()
+                for (annotation in r.annotations!!) {
+                    annotations.add(annotation)
+                }
+                annotationList.add(annotations)
+            }
+        }
+        _annotations = annotationList.toList()
+
+        // Start by iterating through the tokens from yfirlestur and creating our own
+        // start and end indices since we can't rely on the indices given.
+        for (results in _response.result!!) {
+            var startChar = 0
+            var endChar = -1 // to account for index starting at 0
+            for (r in results) {
+                val tokens = r.tokens!!.groupBy { it.i }
+                val annotationIndices = mutableListOf<AnnotationIndices>()
+                for (t in tokens) {
+                    // If 2 items get grouped it's because the token before is being split into two.
+                    // In that case we can safely assume that the latter of the grouped tokens is the
+                    // correct one. See https://github.com/mideind/Yfirlestur/issues/11 for details.
+                    val tokenOriginal = t.value.last().o!!
+                    if (t.value.size > 1) {
+                        annotationIndices.add(
+                            AnnotationIndices(startChar + indexOfFirstCharacter, endChar + indexOfFirstCharacter)
+                        )
+                    }
+                    endChar += tokenOriginal.length
+                    startChar = endChar - tokenOriginal.trim().length + 1
+                    annotationIndices.add(
+                        AnnotationIndices(startChar + indexOfFirstCharacter, endChar + indexOfFirstCharacter)
+                    )
+                }
+                tokensIndices.add(annotationIndices)
+            }
+        }
     }
 }
