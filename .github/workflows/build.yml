@@ -13,14 +13,16 @@ jobs:
           repository: mideind/Yfirlestur
           path: "yfirlestur"
           ref: "dockerfile_development"
-      - name: "asd"
+      - name: "docker build"
         run: |
           if [ ! -f "./gunicorn_user.txt" ]; then
           echo 'root' > gunicorn_user.txt
           echo 'root' >> gunicorn_user.txt
           fi
           docker build -t yfirlestur:latest ./yfirlestur/
-          docker run -it -p 5002:5002 yfirlestur
+      - name: "docker run"
+        run: |
+          docker run -p 5002:5002 yfirlestur
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
