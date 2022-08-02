@@ -6,7 +6,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Checkout yfirlestur repo
+        uses: actions/checkout@v3
+        with:
+          repository: mideind/Yfirlestur
+          path: "yfirlestur"
+          ref: "dockerfile_development"
+      - name: "Run yfirlestur"
+        run: |
+          docker build -t yfirlestur ./yfirlestur/
+          docker run -dp 5002:5002 yfirlestur
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
@@ -16,21 +26,14 @@ jobs:
         uses: android-actions/setup-android@v2
       - name: Set execution flag for gradlew
         run: chmod +x gradlew
-      - name: "Clone Yfirlestur"
-        uses: actions/checkout@master
-        with:
-          repository: mideind/Yfirlestur
-          ref: 'dockerfile_development'
-      - name: "Run yfirlestur"
-        run: |
-          docker build -t yfirlestur .
-          docker run -dp 5002:5002 yfirlestur
-          cd ..
       - name: "Build the app"
         run: |
           git submodule update --init
           ./gradlew assemble
           ./gradlew build -x test
+      - name: "Run tests"
+        run: |
+          ./gradlew test
       - name: Archive reports
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
