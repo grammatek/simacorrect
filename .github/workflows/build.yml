@@ -37,8 +37,9 @@ jobs:
           repository: mideind/Yfirlestur
           path: "yfirlestur"
           ref: "dockerfile_development"
-      - name: "Build Yfirlestur"
+      - name: "asd"
         run: |
+<<<<<<< HEAD
           docker build -t yfirlestur ./yfirlestur/
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85,6 +86,14 @@ jobs:
 >>>>>>> Update build.yml
 =======
           docker run -it yfirlestur:latest
+>>>>>>> Update build.yml
+=======
+          if [ ! -f "./gunicorn_user.txt" ]; then
+          echo 'root' > gunicorn_user.txt
+          echo 'root' >> gunicorn_user.txt
+          fi
+          docker build -t yfirlestur:latest .
+          docker run -it -p 5002:5002 yfirlestur
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
