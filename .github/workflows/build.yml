@@ -13,9 +13,11 @@ jobs:
           repository: mideind/Yfirlestur
           path: "yfirlestur"
           ref: "dockerfile_development"
-      - name: "Run yfirlestur"
+      - name: "Build Yfirlestur"
         run: |
           docker build -t yfirlestur ./yfirlestur/
+      - name: "Run Yfirlestur"
+        run: |
           docker run -dp 5002:5002 yfirlestur
       - name: Setup JDK
         uses: actions/setup-java@v2
