@@ -52,8 +52,7 @@ jobs:
 =======
       - name: "Run Yfirlestur"
         run: |
-          docker run -w ./yfirlestur/ -dp 5002:5002 yfirlestur
-          docker run -w /yfirlestur/ -dp 5002:5002 yfirlestur
+          docker run -v /var/run/docker.sock:/var/run/docker.sock -w /yfirlestur/ -dp 5002:5002 yfirlestur
           cd yfirlestur 
           docker run -dp 5002:5002 yfirlestur
           cd ..
