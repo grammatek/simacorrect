@@ -42,6 +42,7 @@ jobs:
           docker build -t yfirlestur ./yfirlestur/
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       - name: "Run Yfirlestur"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -81,6 +82,9 @@ jobs:
 >>>>>>> Update build.yml
 =======
           docker run yfirlestur:latest
+>>>>>>> Update build.yml
+=======
+          docker run -it yfirlestur:latest
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
