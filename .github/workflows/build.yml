@@ -5,13 +5,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout
-      #  uses: actions/checkout@v3
       - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout yfirlestur repo
         uses: actions/checkout@v3
         with:
           repository: mideind/Yfirlestur
-          #path: "yfirlestur"
+          path: "yfirlestur"
           ref: "dockerfile_development"
       - name: "docker build"
         run: |
@@ -19,7 +19,7 @@ jobs:
           echo 'root' > gunicorn_user.txt
           echo 'root' >> gunicorn_user.txt
           fi
-          docker build -t yfirlestur:latest .
+          docker build -t yfirlestur:latest ./yfirlestur/
       - name: "docker run"
         run: |
           docker run -dp 5002:5002 yfirlestur
