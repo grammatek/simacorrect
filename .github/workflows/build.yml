@@ -43,13 +43,16 @@ jobs:
   api: 
     runs-on: ubuntu-latest
     steps:
+<<<<<<< HEAD
 >>>>>>> Update build.yml
       - name: Checkout yfirlestur repo
+=======
+      - name: Checkout
+>>>>>>> Update build.yml
         uses: actions/checkout@v3
 >>>>>>> Update build.yml
         with:
           repository: mideind/Yfirlestur
-          path: "yfirlestur"
           ref: "dockerfile_development"
       - name: "docker build"
         run: |
@@ -108,6 +111,7 @@ jobs:
           fi
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           docker build -t yfirlestur:latest ./yfirlestur/
 <<<<<<< HEAD
           docker run -it -p 5002:5002 yfirlestur
@@ -118,6 +122,9 @@ jobs:
 >>>>>>> Update build.yml
 =======
           docker build -t yfirlestur:latest ./yfirlestur/
+>>>>>>> Update build.yml
+=======
+          docker build -t yfirlestur:latest .
 >>>>>>> Update build.yml
       - name: "docker run"
         run: |
