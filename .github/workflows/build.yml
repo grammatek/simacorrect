@@ -38,6 +38,16 @@ jobs:
         uses: android-actions/setup-android@v2
       - name: Set execution flag for gradlew
         run: chmod +x gradlew
+        # testing
+      - name: "Clone Yfirlestur"
+        uses: GuillaumeFalourd/clone-github-repo-action@v2
+        with: 
+          owner: mideind
+          repository: Yfirlestur:dockerfile_development
+      - name: "Run yfirlestur"
+        run: |
+          docker build -t yfirlestur ./Yfirlestur/
+          docker run -dp 5002:5002 yfirlestur
       - name: "Build the app"
         run: |
           git submodule update --init
