@@ -129,6 +129,7 @@ jobs:
       - name: "docker run"
         run: |
 <<<<<<< HEAD
+<<<<<<< HEAD
           docker run -p 5002:5002 yfirlestur
 >>>>>>> Update build.yml
 =======
@@ -136,6 +137,9 @@ jobs:
 <<<<<<< HEAD
 >>>>>>> Update build.yml
 =======
+=======
+          docker run -d yfirlestur
+>>>>>>> Update build.yml
   build:
     needs: api
     runs-on: ubuntu-latest
