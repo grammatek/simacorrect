@@ -103,7 +103,11 @@ jobs:
 >>>>>>> Update build.yml
       - name: "docker run"
         run: |
+<<<<<<< HEAD
           docker run -p 5002:5002 yfirlestur
+>>>>>>> Update build.yml
+=======
+          docker run -dp 5002:5002 yfirlestur
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
