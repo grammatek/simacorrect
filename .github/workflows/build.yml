@@ -18,7 +18,7 @@ jobs:
           docker build -t yfirlestur ./yfirlestur/
       - name: "Run Yfirlestur"
         run: |
-          /usr/bin/docker run -dp 5002:5002 yfirlestur
+          docker run yfirlestur:latest
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
