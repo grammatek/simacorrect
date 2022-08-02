@@ -2,6 +2,7 @@ name: Android CI
 on:
   push:
 jobs:
+<<<<<<< HEAD
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -38,6 +39,11 @@ jobs:
 =======
 >>>>>>> Update build.yml
 =======
+=======
+  api: 
+    runs-on: ubuntu-latest
+    steps:
+>>>>>>> Update build.yml
       - name: Checkout yfirlestur repo
         uses: actions/checkout@v3
 >>>>>>> Update build.yml
@@ -120,6 +126,16 @@ jobs:
 >>>>>>> Update build.yml
 =======
           docker run -dp 5002:5002 yfirlestur
+<<<<<<< HEAD
+>>>>>>> Update build.yml
+=======
+  build:
+    needs: api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
