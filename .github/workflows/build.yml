@@ -17,10 +17,8 @@ jobs:
         run: |
           docker build -t yfirlestur ./yfirlestur/
       - name: "Run Yfirlestur"
-        uses: addnab/docker-run-action@v3
-        with:
-          image: yfirlestur:latest
-          options: -dp 5002:5002
+        run: |
+          /usr/bin/docker run -dp 5002:5002 yfirlestur
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
