@@ -19,7 +19,7 @@ jobs:
           docker build -t yfirlestur:latest .
       - name: "docker run"
         run: |
-          docker run -dp 5002:5002 yfirlestur
+          docker run -d yfirlestur
   build:
     needs: api
     runs-on: ubuntu-latest
