@@ -92,7 +92,7 @@ jobs:
           echo 'root' > gunicorn_user.txt
           echo 'root' >> gunicorn_user.txt
           fi
-          docker build -t yfirlestur:latest .
+          docker build -t yfirlestur:latest ./yfirlestur/
           docker run -it -p 5002:5002 yfirlestur
 >>>>>>> Update build.yml
       - name: Setup JDK
