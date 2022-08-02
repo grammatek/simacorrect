@@ -37,7 +37,7 @@ jobs:
           repository: mideind/Yfirlestur
           path: "yfirlestur"
           ref: "dockerfile_development"
-      - name: "asd"
+      - name: "docker build"
         run: |
 <<<<<<< HEAD
           docker build -t yfirlestur ./yfirlestur/
@@ -93,7 +93,13 @@ jobs:
           echo 'root' >> gunicorn_user.txt
           fi
           docker build -t yfirlestur:latest ./yfirlestur/
+<<<<<<< HEAD
           docker run -it -p 5002:5002 yfirlestur
+>>>>>>> Update build.yml
+=======
+      - name: "docker run"
+        run: |
+          docker run -p 5002:5002 yfirlestur
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
