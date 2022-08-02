@@ -76,7 +76,11 @@ jobs:
 >>>>>>> Update build.yml
 =======
         run: |
+<<<<<<< HEAD
           /usr/bin/docker run -dp 5002:5002 yfirlestur
+>>>>>>> Update build.yml
+=======
+          docker run yfirlestur:latest
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
