@@ -43,6 +43,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
       - name: "Run Yfirlestur"
+<<<<<<< HEAD
         run: |
 <<<<<<< HEAD
           docker run -dp 5002:5002 yfirlestur
@@ -65,6 +66,12 @@ jobs:
 >>>>>>> Update build.yml
 =======
           docker run -it --entrypoint /bin/bash -dp 5002:5002 yfirlestur:latest
+>>>>>>> Update build.yml
+=======
+        uses: addnab/docker-run-action@v3
+        with:
+          image: yfirlestur:latest
+          options: -dp 5002:5002
 >>>>>>> Update build.yml
       - name: Setup JDK
         uses: actions/setup-java@v2
