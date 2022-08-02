@@ -41,7 +41,7 @@ jobs:
       - name: "Clone Yfirlestur"
         uses: actions/checkout@master
         with:
-          name: mideind/Yfirlestur
+          repository: mideind/Yfirlestur
           ref: 'dockerfile_development'
       - name: "Run yfirlestur"
         run: |
