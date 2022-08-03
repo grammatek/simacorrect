@@ -212,6 +212,7 @@ jobs:
         run: |
           docker load --input /tmp/myimage.tar
           docker image ls -a
+          docker run -dp 5002:5002 myimage:latest
       
 <<<<<<< HEAD
 >>>>>>> Update build.yml
