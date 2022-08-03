@@ -17,11 +17,6 @@ jobs:
           echo 'root' >> gunicorn_user.txt
           fi
           docker build -t yfirlestur:latest .
-      - name: "Docker build"
-        uses: docker/build-push-action@v2
-        with:
-          tags: yfirlestur:latest
-          push: false
       - name: "Docker run"
         uses: addnab/docker-run-action@v3
         with:
