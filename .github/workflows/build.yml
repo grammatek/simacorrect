@@ -150,12 +150,15 @@ jobs:
 =======
 =======
           docker build -t yfirlestur:latest .
+<<<<<<< HEAD
 >>>>>>> Update build.yml
       - name: "Docker build"
         uses: docker/build-push-action@v2
         with:
           tags: yfirlestur:latest
           push: false
+=======
+>>>>>>> Update build.yml
       - name: "Docker run"
         uses: addnab/docker-run-action@v3
         with:
