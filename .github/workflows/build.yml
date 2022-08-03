@@ -16,7 +16,7 @@ jobs:
           tags: yfirlestur:latest
           push: false
       - name: "Docker run"
-      - uses: addnab/docker-run-action@v3
+        uses: addnab/docker-run-action@v3
         with:
           image: yfirlestur:latest
           run: |
