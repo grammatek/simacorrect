@@ -19,7 +19,15 @@ jobs:
       - name: "Run yfirlestur"
         run: |
           docker build -t yfirlestur .
-          docker run -dp 5002:5002 yfirlestur
+      - uses: docker/build-push-action@v2
+        with:
+          tags: yfirlestur:latest
+          push: false
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: yfirlestur:latest
+          options: -dp 5002:5002
+        
   build:
     needs: api
     runs-on: ubuntu-latest
