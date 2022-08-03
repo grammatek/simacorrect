@@ -42,7 +42,11 @@ jobs:
           tags: localhost:5002/name/yfirlestur:latest
       - uses: addnab/docker-run-action@v3
         with:
+<<<<<<< HEAD
           image: name/yfirlestur:latest
+>>>>>>> Update build.yml
+=======
+          image: localhost:5002/name/yfirlestur:latest
 >>>>>>> Update build.yml
         
   build:
