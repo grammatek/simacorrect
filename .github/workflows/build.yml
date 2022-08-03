@@ -201,6 +201,7 @@ jobs:
         run: |
           docker build -t yfirlestur .
 <<<<<<< HEAD
+<<<<<<< HEAD
           docker run -dp 5002:5002 yfirlestur
 >>>>>>> Update build.yml
 =======
@@ -208,6 +209,8 @@ jobs:
         with:
           tags: yfirlestur:latest
           push: false
+=======
+>>>>>>> Update build.yml
       - uses: addnab/docker-run-action@v3
         with:
           image: yfirlestur:latest
