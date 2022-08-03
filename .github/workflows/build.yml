@@ -189,17 +189,6 @@ jobs:
         with:
           name: myimage
           path: /tmp/myimage.tar
-        # This ugly bit is necessary if you don't want your cache to grow forever
-        # till it hits GitHub's limit of 5GB.
-        # Temp fix
-        # docker/build-push-action#252
-        # moby/buildkit#1896
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-
           
       #- name: "Docker run"
       #  uses: addnab/docker-run-action@v3
