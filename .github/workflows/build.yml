@@ -2,25 +2,21 @@ name: Android CI
 on:
   push:
 jobs:
-  api: 
+  api:
     runs-on: ubuntu-latest
-    services: # create local registry to push images onto
-      registry: 
-        image: registry:2
-        ports: 
-          - 5002:5002
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           repository: mideind/Yfirlestur
           ref: "dockerfile_development"
-      - name: "docker build"
+      - name: Docker build
         run: |
           if [ ! -f "./gunicorn_user.txt" ]; then
           echo 'root' > gunicorn_user.txt
           echo 'root' >> gunicorn_user.txt
           fi
+<<<<<<< HEAD
 <<<<<<< HEAD
       - name: "Run yfirlestur"
         run: |
@@ -77,12 +73,14 @@ jobs:
           ./gradlew assemble
           ./gradlew build -x test
       - name: "Run tests"
+=======
+          docker build -t yfirlestur:latest ./yfirlestur/
+      - name: Docker run
         run: |
-          ./gradlew test
-      - name: Archive reports
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: archive-reports
-          path: |
-            app/build/reports/**/*
+          docker run -dp 5002:5002 yfirlestur
+      - name: Curl
+>>>>>>> Update build.yml
+        run: |
+          curl localhost:5002/correct.api -d "text=hello"
+        
+  
