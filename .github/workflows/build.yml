@@ -2,28 +2,58 @@ name: Android CI
 on:
   push:
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Checkout Yfirlestur Repo
         uses: actions/checkout@v3
         with:
           repository: mideind/Yfirlestur
           path: yfirlestur
           ref: "dockerfile_development"
+      - name: Pre req
+        run: |
+          if [ ! -f "./gunicorn_user.txt" ]; then
+          echo 'root' > yfirlestur/gunicorn_user.txt
+          echo 'root' >> yfirlestur/gunicorn_user.txt
+          fi
       - uses: docker/build-push-action@v2
         with:
           context: ./yfirlestur/
           tags: yfirlestur:latest
           push: false
-          load: true
-      - uses: addnab/docker-run-action@v3
-        with:
-          options: -dp 5002:5002
-          image: yfirlestur:latest
-      - name: Curl
+          load: true          
+      - name: Docker Run
         run: |
-          curl --tlsv1.2 localhost:5002/correct.api -d "text=hello"
+          docker run -p 5002:5002 -v ${{ github.workspace }}/yfirlestur:latest
+        #docker build -t yfirlestur:latest ./yfirlestur/
+          
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: "zulu"
+          java-version: 11
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+      - name: Set execution flag for gradlew
+        run: chmod +x gradlew
+      - name: "Build the app"
+        run: |
+          git submodule update --init
+          ./gradlew assemble
+          ./gradlew build -x test
+      - name: "Run tests"
+        run: |
+          ./gradlew test
+      - name: Archive reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: archive-reports
+          path: |
+            app/build/reports/**/*
 
         
   
