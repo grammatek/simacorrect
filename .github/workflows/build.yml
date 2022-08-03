@@ -19,10 +19,6 @@ jobs:
       - name: "Run yfirlestur"
         run: |
           docker build -t yfirlestur .
-      - uses: docker/build-push-action@v2
-        with:
-          tags: yfirlestur:latest
-          push: false
       - uses: addnab/docker-run-action@v3
         with:
           image: yfirlestur:latest
