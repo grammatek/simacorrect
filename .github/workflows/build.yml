@@ -4,33 +4,21 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5002:5002
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           repository: mideind/Yfirlestur
           ref: "dockerfile_development"
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - uses: docker/build-push-action@v2
         with:
-          driver-opts: network=host
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v3
+          tags: test-image:latest
+          push: false
+          load: true
+      - uses: addnab/docker-run-action@v3
         with:
-          context: .
-          push: true
-          tags: localhost:5002/name/app:latest
-      -
-        name: Inspect
-        run: |
-          docker buildx imagetools inspect localhost:5000/name/app:latest
+          image: test-image:latest
+          run: echo "hello world"
 
         
   
