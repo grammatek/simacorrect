@@ -5,21 +5,21 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Yfirlestur Repo
         uses: actions/checkout@v3
         with:
           repository: mideind/Yfirlestur
+          path: yfirlestur
           ref: "dockerfile_development"
       - uses: docker/build-push-action@v2
         with:
-          context: .
-          tags: test-image:latest
+          context: ./yfirlestur/
+          tags: yfirlestur:latest
           push: false
           load: true
       - uses: addnab/docker-run-action@v3
         with:
-          image: test-image:latest
-          run: echo "hello world"
+          image: yfirlestur:latest
 
         
   
