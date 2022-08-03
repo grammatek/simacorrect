@@ -40,6 +40,7 @@ jobs:
           context: .
           push: true
           tags: localhost:5002/name/yfirlestur:latest
+<<<<<<< HEAD
       - uses: addnab/docker-run-action@v3
         with:
 <<<<<<< HEAD
@@ -47,6 +48,12 @@ jobs:
 >>>>>>> Update build.yml
 =======
           image: localhost:5002/name/yfirlestur:latest
+>>>>>>> Update build.yml
+=======
+      - name: Docker run
+        run: |
+          docker run localhost:5002/name/yfirlestur:latest
+          
 >>>>>>> Update build.yml
         
   build:
