@@ -27,7 +27,7 @@ jobs:
           load: true          
       - name: Docker Run
         run: |
-          docker run -p 5002:5002 -v ${{ github.workspace }}/yfirlestur:latest
+          docker run -dp 5002:5002 yfirlestur:latest
         #docker build -t yfirlestur:latest ./yfirlestur/
           
       - name: Setup JDK
