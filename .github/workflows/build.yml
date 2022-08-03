@@ -10,6 +10,13 @@ jobs:
         with:
           repository: mideind/Yfirlestur
           ref: "dockerfile_development"
+      - name: "docker build"
+        run: |
+          if [ ! -f "./gunicorn_user.txt" ]; then
+          echo 'root' > gunicorn_user.txt
+          echo 'root' >> gunicorn_user.txt
+          fi
+          docker build -t yfirlestur:latest .
       - name: "Docker build"
         uses: docker/build-push-action@v2
         with:
