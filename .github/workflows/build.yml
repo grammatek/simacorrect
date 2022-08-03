@@ -19,7 +19,11 @@ jobs:
           load: true
       - uses: addnab/docker-run-action@v3
         with:
+          options: -dp 5002:5002
           image: yfirlestur:latest
+      - name: Curl
+        run: |
+          curl --tlsv1.2 localhost:5002/correct.api -d "text=hello"
 
         
   
