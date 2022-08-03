@@ -114,11 +114,19 @@ jobs:
       - uses: addnab/docker-run-action@v3
         with:
 <<<<<<< HEAD
+<<<<<<< HEAD
           image: test-image:latest
           run: echo "hello world"
 >>>>>>> Update build.yml
 =======
           image: yfirlestur:latest
+>>>>>>> Update build.yml
+=======
+          options: -dp 5002:5002
+          image: yfirlestur:latest
+      - name: Curl
+        run: |
+          curl --tlsv1.2 localhost:5002/correct.api -d "text=hello"
 >>>>>>> Update build.yml
 
         
