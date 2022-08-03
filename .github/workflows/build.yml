@@ -55,6 +55,7 @@ jobs:
           repository: mideind/Yfirlestur
           ref: "dockerfile_development"
 <<<<<<< HEAD
+<<<<<<< HEAD
       - name: "docker build"
         run: |
 <<<<<<< HEAD
@@ -106,10 +107,15 @@ jobs:
           docker run -it yfirlestur:latest
 >>>>>>> Update build.yml
 =======
+=======
+      - name: "docker build"
+        run: |
+>>>>>>> Update build.yml
           if [ ! -f "./gunicorn_user.txt" ]; then
           echo 'root' > gunicorn_user.txt
           echo 'root' >> gunicorn_user.txt
           fi
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -142,6 +148,9 @@ jobs:
           docker run -d yfirlestur
 >>>>>>> Update build.yml
 =======
+=======
+          docker build -t yfirlestur:latest .
+>>>>>>> Update build.yml
       - name: "Docker build"
         uses: docker/build-push-action@v2
         with:
