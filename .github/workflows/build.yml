@@ -19,10 +19,11 @@ jobs:
       - name: "Run yfirlestur"
         run: |
           docker build -t yfirlestur .
-      - uses: addnab/docker-run-action@v3
+      - name: Run the build process with Docker
+        uses: addnab/docker-run-action@v3
         with:
-          image: yfirlestur:latest
-          options: -dp 5002:5002
+            image: yfirlestur:latest
+            options: -v ${{ github.workspace }}:/var/www
         
   build:
     needs: api
