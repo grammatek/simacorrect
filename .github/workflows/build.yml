@@ -2,27 +2,32 @@ name: Android CI
 on:
   push:
 jobs:
-  api:
+  docker:
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5002:5002
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
         with:
-          repository: mideind/Yfirlestur
-          path: "yfirlestur"
-          ref: "dockerfile_development"
-      - name: Docker build
+          driver-opts: network=host
+      - name: Build and push to local registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: localhost:5002/name/app:latest
+      -
+        name: Inspect
         run: |
-          if [ ! -f "./gunicorn_user.txt" ]; then
-          echo 'root' > gunicorn_user.txt
-          echo 'root' >> gunicorn_user.txt
-          fi
-          docker build -t yfirlestur:latest ./yfirlestur/
-      - name: Docker run
-        run: |
-          docker run -dp 5002:5002 yfirlestur
-      - name: Curl
-        run: |
-          curl --tlsv1.2 localhost:5002/correct.api -d "text=hello"
+          docker buildx imagetools inspect localhost:5000/name/app:latest
+
         
   
