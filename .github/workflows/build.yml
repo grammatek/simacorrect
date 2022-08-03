@@ -78,10 +78,10 @@ jobs:
           docker build -t yfirlestur:latest ./yfirlestur/
       - name: Docker run
         run: |
-          docker run -d yfirlestur
+          docker run -dp 5002:5002 yfirlestur
       - name: Curl
 >>>>>>> Update build.yml
         run: |
-          curl localhost:5002/correct.api -d "text=hello"
+          curl --tlsv1.2 localhost:5002/correct.api -d "text=hello"
         
   
