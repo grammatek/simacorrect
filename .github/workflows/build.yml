@@ -2,67 +2,26 @@ name: Android CI
 on:
   push:
 jobs:
-  api: 
+  api:
     runs-on: ubuntu-latest
-    services: # create local registry to push images onto
-      registry: 
-        image: registry:2
-        ports: 
-          - 5002:5002
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           repository: mideind/Yfirlestur
           ref: "dockerfile_development"
-      - name: "docker build"
+      - name: Docker build
         run: |
           if [ ! -f "./gunicorn_user.txt" ]; then
           echo 'root' > gunicorn_user.txt
           echo 'root' >> gunicorn_user.txt
           fi
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          driver-opts: network=host
-      - name: Build and push to local registry
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: localhost:5002/name/yfirlestur:latest
+          docker build -t yfirlestur:latest ./yfirlestur/
       - name: Docker run
         run: |
-          docker run localhost:5002/name/yfirlestur:latest
-          
+          docker run -dp 5002:5002 yfirlestur
+      - name: Curl
+        run: |
+          curl localhost:5002/correct.api -d "text=hello"
         
-  build:
-    needs: api
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: "zulu"
-          java-version: 11
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-      - name: Set execution flag for gradlew
-        run: chmod +x gradlew
-      - name: "Build the app"
-        run: |
-          git submodule update --init
-          ./gradlew assemble
-          ./gradlew build -x test
-      - name: "Run tests"
-        run: |
-          ./gradlew test
-      - name: Archive reports
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: archive-reports
-          path: |
-            app/build/reports/**/*
+  
