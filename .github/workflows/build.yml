@@ -78,7 +78,7 @@ jobs:
           docker build -t yfirlestur:latest ./yfirlestur/
       - name: Docker run
         run: |
-          docker run -dp 5002:5002 yfirlestur
+          docker run -d yfirlestur
       - name: Curl
 >>>>>>> Update build.yml
         run: |
