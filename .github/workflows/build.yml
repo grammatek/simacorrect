@@ -31,9 +31,10 @@ jobs:
           context: .
           push: true
           tags: localhost:5002/name/yfirlestur:latest
-      - uses: addnab/docker-run-action@v3
-        with:
-          image: localhost:5002/name/yfirlestur:latest
+      - name: Docker run
+        run: |
+          docker run localhost:5002/name/yfirlestur:latest
+          
         
   build:
     needs: api
