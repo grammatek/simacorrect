@@ -33,7 +33,7 @@ jobs:
           tags: localhost:5002/name/yfirlestur:latest
       - uses: addnab/docker-run-action@v3
         with:
-          image: name/yfirlestur:latest
+          image: localhost:5002/name/yfirlestur:latest
         
   build:
     needs: api
