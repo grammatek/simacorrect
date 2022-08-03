@@ -54,6 +54,7 @@ jobs:
         with:
           repository: mideind/Yfirlestur
           ref: "dockerfile_development"
+<<<<<<< HEAD
       - name: "docker build"
         run: |
 <<<<<<< HEAD
@@ -139,6 +140,22 @@ jobs:
 =======
 =======
           docker run -d yfirlestur
+>>>>>>> Update build.yml
+=======
+      - name: "Docker build"
+        uses: docker/build-push-action@v2
+        with:
+          tags: yfirlestur:latest
+          push: false
+      - name: "Docker run"
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: yfirlestur:latest
+          run: |
+            if [ ! -f "./gunicorn_user.txt" ]; then
+            echo 'root' > gunicorn_user.txt
+            echo 'root' >> gunicorn_user.txt
+            fi
 >>>>>>> Update build.yml
   build:
     needs: api
