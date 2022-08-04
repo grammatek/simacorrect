@@ -206,13 +206,14 @@ class YfirlesturAnnotationTest {
     }
 
     @Test
-    fun `multiple sentences hold `() {
+    fun `capitalization ignored for new sentences`() {
         val suggestionLimit = 5
-        val text = "Það er víst. ég dreymi"
+        val text = "Það er víst. það er víst"
         val dictionary = arrayListOf<String>()
         val response = api.correctApiPost(text)
         val ylAnnotation = YfirlesturAnnotation(response, text)
-        val asd = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        asd
+        val suggestion = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+
+        assertThat(suggestion.count()).isEqualTo(0)
     }
 }

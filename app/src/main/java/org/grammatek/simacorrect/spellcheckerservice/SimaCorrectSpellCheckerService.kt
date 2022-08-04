@@ -77,13 +77,9 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 val suggestionList: Array<SuggestionsInfo>
                 val suggestionsIndices: Array<YfirlesturAnnotation.AnnotationIndices>
                 try {
-                    var text = textInfos[i].text!!
+                    val text = textInfos[i].text!!
                     if (text.isBlank()) {
                         continue
-                    }
-                    if (text.trim()[0].isLowerCase()) {
-                        val index = text.indexOf(text.trim())
-                        text = StringBuilder(text).also { it[index] = text.trim()[0].uppercaseChar() }.toString()
                     }
 
                     val response = ConnectionManager.correctSentence(text)

@@ -185,7 +185,10 @@ class YfirlesturAnnotation(
             for (r in results) {
                 val annotations = arrayListOf<Annotations>()
                 for (annotation in r.annotations!!) {
-                    annotations.add(annotation)
+                    // Make sure to ignore capitalization for beginning of sentences
+                    if (!(annotation.code == "Z002" && annotation.start == 0)) {
+                        annotations.add(annotation)
+                    }
                 }
                 annotationList.add(annotations)
             }
