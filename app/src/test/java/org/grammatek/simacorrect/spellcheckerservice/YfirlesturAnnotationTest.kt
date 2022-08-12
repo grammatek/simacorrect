@@ -1,7 +1,9 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
 import com.google.common.truth.Truth.assertThat
-import org.grammatek.apis.DevelopersApi
+import org.grammatek.apis.UsersApi
+import org.grammatek.models.CorrectRequest
+import org.grammatek.models.CorrectResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -10,7 +12,7 @@ typealias AnnotationIndices = YfirlesturAnnotation.AnnotationIndices
 
 @RunWith(RobolectricTestRunner::class)
 class YfirlesturAnnotationTest {
-    private val api = DevelopersApi("http://localhost:5002")
+    private val api = UsersApi("http://localhost:5002")
     private val testCases: List<String> = listOf(
         "Einn af drengjunum fóru í sund af gefnu tilefni.",
         "Mig hlakkaði til.",
@@ -22,6 +24,20 @@ class YfirlesturAnnotationTest {
         "Önnu kveið # fyrir skóladeginum.",
         "Er afhverju eitt eða tvö orð?"
     )
+
+    // TODO: Delete
+    @Test
+    fun `testing new changes`() {
+        val suggestionLimit = 5
+        val dictionary = arrayListOf<String>()
+        val text = "hallo"
+        val response = api.correctApiPost(CorrectRequest(text))
+        val ylAnnotation = YfirlesturAnnotation(response, text)
+        var suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+        for (suggestions in suggestionInfo) {
+            assertThat(suggestions.suggestionsCount).isAtMost(suggestionLimit)
+        }
+    }
 
     @Test
     fun `we only get expected suggestions, nothing more, nothing less`() {
@@ -39,7 +55,7 @@ class YfirlesturAnnotationTest {
             listOf("af hverju"),
         )
         for (i in testCases.indices) {
-            val response = api.correctApiPost(testCases[i])
+            val response = api.correctApiPost(CorrectRequest(testCases[i]))
             val suggestionsInfo = YfirlesturAnnotation(response, testCases[i]).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
             val actualSuggestions: MutableList<String> = arrayListOf()
             for (suggestionInfo in suggestionsInfo) {
@@ -74,7 +90,7 @@ class YfirlesturAnnotationTest {
         )
 
         for (i in texts.indices) {
-            val response = api.correctApiPost(texts[i])
+            val response: CorrectResponse = api.correctApiPost(CorrectRequest(texts[i]))
             val ylAnnotations = YfirlesturAnnotation(response, texts[i])
             ylAnnotations.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
             val annotations = ylAnnotations.suggestionsIndices
@@ -92,7 +108,7 @@ class YfirlesturAnnotationTest {
         val suggestionLimit = 5
         val dictionary = arrayListOf<String>()
         for (testCase in testCases) {
-            val response = api.correctApiPost(testCase)
+            val response = api.correctApiPost(CorrectRequest(testCase))
             val ylAnnotation = YfirlesturAnnotation(response, testCase)
             ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
             var size = 0
@@ -107,7 +123,7 @@ class YfirlesturAnnotationTest {
     fun `is dictionary taken into account for suggestions`() {
         val suggestionLimit = 5
         val text = "Eg dreymi"
-        val response = api.correctApiPost(text)
+        val response = api.correctApiPost(CorrectRequest(text))
         val dictionary = arrayListOf<String>()
         var suggestionsInfo = YfirlesturAnnotation(response, text).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
         assertThat(suggestionsInfo).isNotEmpty()
@@ -125,7 +141,7 @@ class YfirlesturAnnotationTest {
     fun `is suggestion limit enforced`() {
         var suggestionLimit = 0
         val text = "eg dreimi um að leita af mindinni"
-        val response = api.correctApiPost(text)
+        val response = api.correctApiPost(CorrectRequest(text))
         val dictionary = arrayListOf<String>()
 
         val ylAnnotation = YfirlesturAnnotation(response, text)
@@ -148,7 +164,7 @@ class YfirlesturAnnotationTest {
         val startIndices = listOf(3, 23)
         val endIndices = listOf(10, 25)
         val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(text)
+        val response = api.correctApiPost(CorrectRequest(text))
         val ylAnnotation = YfirlesturAnnotation(response, text)
         ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
         // TODO: check for annotated words that are "suggestionless" as well.
@@ -164,7 +180,7 @@ class YfirlesturAnnotationTest {
         val capitalizedText = "Mig langar ekki út."
         val nonCapitalizedText = "mig langar ekki út."
         val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(capitalizedText)
+        val response = api.correctApiPost(CorrectRequest(capitalizedText))
         // The spell checker service takes care of capitalizing the first letter
         // so we have to test it differently e.g. see if the same sentence has
         // different suggestions if the first word is capitalized or not.
@@ -181,7 +197,7 @@ class YfirlesturAnnotationTest {
         // special characters have different lengths in Yfirlestur, from Android.
         val suggestionLimit = 0
         val text = "\uD83E\uDD76\u200B er kallt og \uD83E\uDD75 er heittt"
-        val response = api.correctApiPost(text)
+        val response = api.correctApiPost(CorrectRequest(text))
         val dictionary = arrayListOf<String>()
         val textLengthByYfirlestur = response.stats!!.numChars
         val textLengthByAndroid = response.text!!.length
@@ -210,7 +226,7 @@ class YfirlesturAnnotationTest {
         val suggestionLimit = 5
         val text = "Það er víst. það er víst"
         val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(text)
+        val response = api.correctApiPost(CorrectRequest(text))
         val ylAnnotation = YfirlesturAnnotation(response, text)
         val suggestion = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
 

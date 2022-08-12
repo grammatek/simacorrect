@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 
-@kotlinx.serialization.ExperimentalSerializationApi
 @Serializer(forClass = StringBuilder::class)
 object StringBuilderAdapter : KSerializer<StringBuilder> {
     override fun serialize(encoder: Encoder, value: StringBuilder) {

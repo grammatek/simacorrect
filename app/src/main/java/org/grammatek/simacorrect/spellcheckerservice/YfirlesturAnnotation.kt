@@ -3,7 +3,7 @@ package org.grammatek.simacorrect.spellcheckerservice
 import android.os.Build
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
-import org.grammatek.models.YfirlesturResponse
+import org.grammatek.models.CorrectResponse
 import java.lang.Exception
 import java.lang.NullPointerException
 
@@ -14,9 +14,9 @@ import java.lang.NullPointerException
  * @param [response] is the entire JSON response from Yfirlestur's API.
  */
 class YfirlesturAnnotation(
-    response: YfirlesturResponse?,
+    response: CorrectResponse?,
     text: String?,
-    _response: YfirlesturResponse? = response,
+    _response: CorrectResponse? = response,
     _originalText: String = response?.text ?: throw NullPointerException("original text null"),
     private val _unalteredOriginalText: String? = text
 ) {

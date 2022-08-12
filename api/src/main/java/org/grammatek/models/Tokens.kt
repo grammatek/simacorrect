@@ -1,9 +1,9 @@
 /**
- * Grammar correction API
+ * Spelling/Grammar correction API
  *
- * This API interfaces Yfirlestur.is/
+ * This API interfaces an Yfirlestur.is compatible service
  *
- * The version of the OpenAPI document: 0.1.0-oas3
+ * The version of the OpenAPI document: 0.1.2
  * Contact: info@grammatek.com
  *
  * Please note:
@@ -23,6 +23,7 @@ package org.grammatek.models
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Contextual
 
 /**
  * 

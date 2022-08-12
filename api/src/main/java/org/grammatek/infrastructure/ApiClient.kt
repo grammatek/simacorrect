@@ -11,10 +11,14 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.Headers
 import okhttp3.MultipartBody
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
 import okhttp3.internal.EMPTY_REQUEST
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.IOException
 import java.net.URLConnection
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,7 +44,7 @@ open class ApiClient(val baseUrl: String) {
         var username: String? = null
         var password: String? = null
         var accessToken: String? = null
-        const val baseUrlKey = "org.openapitools.client.baseUrl"
+        const val baseUrlKey = "org.grammatek.baseUrl"
 
         @JvmStatic
         val client: OkHttpClient by lazy {
@@ -125,7 +129,7 @@ open class ApiClient(val baseUrl: String) {
         }
         if (T::class.java == File::class.java) {
             // return tempfile
-            val f = java.nio.file.Files.createTempFile("tmp.org.openapitools.client", null).toFile()
+            val f = java.nio.file.Files.createTempFile("tmp.org.grammatek", null).toFile()
             f.deleteOnExit()
             val out = BufferedWriter(FileWriter(f))
             out.write(bodyContent)

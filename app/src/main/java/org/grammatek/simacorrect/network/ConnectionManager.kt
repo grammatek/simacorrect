@@ -7,8 +7,9 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.util.Log
-import org.grammatek.apis.DevelopersApi
-import org.grammatek.models.YfirlesturResponse
+import org.grammatek.apis.UsersApi
+import org.grammatek.models.CorrectRequest
+import org.grammatek.models.CorrectResponse
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -121,7 +122,7 @@ class ConnectionManager {
 
     companion object {
         private val TAG = ConnectionManager::class.java.simpleName
-        private val API: DevelopersApi = DevelopersApi()
+        private val API: UsersApi = UsersApi()
 
         var g_isNetworkConnected: Boolean = false
             private set
@@ -136,16 +137,28 @@ class ConnectionManager {
          * @return YfirlesturResponse which contains the spell checking
          * information of [textToCorrect].
          */
-        fun correctSentence(textToCorrect: String): YfirlesturResponse? {
+        fun correctSentence(textToCorrect: String): CorrectResponse? {
             if(!g_isServiceReachable || !g_isNetworkConnected) {
                 Log.d(TAG, "correctSentence: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
                 return null
             }
             try {
-                return API.correctApiPost(textToCorrect)
+                //        text: Dreimdi stórann brauðhleyf
+                //        all_errors: true
+                //        annotate_unparsed_sentences: true
+                //        generate_suggestion_list: false
+                //        suppress_suggestions: false
+                //        ignore_wordlist: ["like", "feisbook"]
+                //        one_sent: false
+                //        ignore_rules: ["Z002"]
+                val request = CorrectRequest(textToCorrect)
+//                val request = CorrectRequest(textToCorrect, true, true, false, false, listOf("like"), false, listOf("Z002"))
+                Log.d(TAG, "RETURNING THE REQUEST")
+                return API.correctApiPost(request)
             } catch (e: Exception) {
                 Log.d(TAG, "Exception: $e")
             }
+            Log.d(TAG, "RETURNING A NULL")
             return null
         }
     }

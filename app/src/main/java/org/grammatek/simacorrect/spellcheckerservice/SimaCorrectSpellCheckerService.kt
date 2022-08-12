@@ -83,6 +83,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                     }
 
                     val response = ConnectionManager.correctSentence(text)
+                    Log.d(TAG, "text: ${response?.text}, response: $response")
                     val ylAnnotation = YfirlesturAnnotation(response, textInfos[i].text)
                     suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit, _userDict).toTypedArray()
                     suggestionsIndices = ylAnnotation.suggestionsIndices.toTypedArray()

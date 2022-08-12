@@ -9,7 +9,6 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import java.util.concurrent.atomic.AtomicBoolean
 
-@kotlinx.serialization.ExperimentalSerializationApi
 @Serializer(forClass = AtomicBoolean::class)
 object AtomicBooleanAdapter : KSerializer<AtomicBoolean> {
     override fun serialize(encoder: Encoder, value: AtomicBoolean) {

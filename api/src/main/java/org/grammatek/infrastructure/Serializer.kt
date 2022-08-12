@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 object Serializer {
-    @kotlinx.serialization.ExperimentalSerializationApi
     @JvmStatic
     val kotlinSerializationAdapters = SerializersModule {
         contextual(BigDecimal::class, BigDecimalAdapter)

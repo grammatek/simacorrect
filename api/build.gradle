@@ -15,3 +15,9 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.4.2"
 }
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+    }
+}
