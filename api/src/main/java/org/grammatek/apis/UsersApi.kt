@@ -20,27 +20,10 @@
 
 package org.grammatek.apis
 
-import java.io.IOException
-
+import org.grammatek.infrastructure.*
 import org.grammatek.models.CorrectRequest
 import org.grammatek.models.CorrectResponse
-import org.grammatek.models.Error
-
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-import org.grammatek.infrastructure.ApiClient
-import org.grammatek.infrastructure.ApiResponse
-import org.grammatek.infrastructure.ClientException
-import org.grammatek.infrastructure.ClientError
-import org.grammatek.infrastructure.ServerException
-import org.grammatek.infrastructure.ServerError
-import org.grammatek.infrastructure.MultiValueMap
-import org.grammatek.infrastructure.RequestConfig
-import org.grammatek.infrastructure.RequestMethod
-import org.grammatek.infrastructure.ResponseType
-import org.grammatek.infrastructure.Success
-import org.grammatek.infrastructure.toMultiValue
+import java.io.IOException
 
 class UsersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
     companion object {
@@ -51,19 +34,19 @@ class UsersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     }
 
     /**
-    * Correct spelling/grammar of text
-    * 
-    * @param correctRequest  (optional)
-    * @return CorrectResponse
-    * @throws IllegalStateException If the request is not correctly configured
-    * @throws IOException Rethrows the OkHttp execute method exception
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
+     * Correct spelling/grammar of text
+     *
+     * @param correctRequest
+     * @return CorrectResponse
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun correctApiPost(correctRequest: CorrectRequest?) : CorrectResponse {
+    fun correctApiPost(correctRequest: CorrectRequest) : CorrectResponse {
         val localVarResponse = correctApiPostWithHttpInfo(correctRequest = correctRequest)
 
         return when (localVarResponse.responseType) {
@@ -82,16 +65,16 @@ class UsersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     }
 
     /**
-    * Correct spelling/grammar of text
-    * 
-    * @param correctRequest  (optional)
-    * @return ApiResponse<CorrectResponse?>
-    * @throws IllegalStateException If the request is not correctly configured
-    * @throws IOException Rethrows the OkHttp execute method exception
-    */
+     * Correct spelling/grammar of text
+     *
+     * @param correctRequest
+     * @return ApiResponse<CorrectResponse?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun correctApiPostWithHttpInfo(correctRequest: CorrectRequest?) : ApiResponse<CorrectResponse?> {
+    fun correctApiPostWithHttpInfo(correctRequest: CorrectRequest) : ApiResponse<CorrectResponse?> {
         val localVariableConfig = correctApiPostRequestConfig(correctRequest = correctRequest)
 
         return request<CorrectRequest, CorrectResponse>(
@@ -100,12 +83,12 @@ class UsersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     }
 
     /**
-    * To obtain the request config of the operation correctApiPost
-    *
-    * @param correctRequest  (optional)
-    * @return RequestConfig
-    */
-    fun correctApiPostRequestConfig(correctRequest: CorrectRequest?) : RequestConfig<CorrectRequest> {
+     * To obtain the request config of the operation correctApiPost
+     *
+     * @param correctRequest
+     * @return RequestConfig
+     */
+    fun correctApiPostRequestConfig(correctRequest: CorrectRequest) : RequestConfig<CorrectRequest> {
         val localVariableBody = correctRequest
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
