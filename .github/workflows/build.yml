@@ -12,7 +12,6 @@ jobs:
         with:
           repository: mideind/Yfirlestur
           path: yfirlestur
-          ref: "dockerfile_development"
       - name: Yfirlestur Dependency
         run: |
           if [ ! -f "./gunicorn_user.txt" ]; then
