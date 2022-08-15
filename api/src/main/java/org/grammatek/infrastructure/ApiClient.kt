@@ -110,9 +110,6 @@ open class ApiClient(val baseUrl: String) {
                     EMPTY_REQUEST
                 } else {
                     Serializer.jvmJson.encodeToString(content)
-                        // TODO: Remove bytearray conversion once yfirlestur supports UTF-8
-                        //  see: https://github.com/mideind/Yfirlestur/issues/15
-                        .toByteArray()
                         .toRequestBody(
                             mediaType.toMediaTypeOrNull()
                         )
