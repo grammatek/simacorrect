@@ -25,6 +25,7 @@ class ConnectionManager {
     private var _threadPoolExecutor: ScheduledThreadPoolExecutor? = null
     private var _periodicFuture: ScheduledFuture<*>? = null
     private val _apiServer: String = "yfirlestur.is"
+    private val _port: Int = 443
 
     /**
      * Registers network callback to monitor network changes
@@ -108,7 +109,7 @@ class ConnectionManager {
         try {
             Log.d(TAG, "Is Reachable: $g_isServiceReachable, Is Connected: $g_isNetworkConnected")
 
-            if (isHostAvailable(_apiServer, 443, 2000)) {
+            if (isHostAvailable(_apiServer, _port, 2000)) {
                 g_isServiceReachable = true
                 Log.d(TAG, "$_apiServer Service available!")
             } else {
@@ -143,22 +144,11 @@ class ConnectionManager {
                 return null
             }
             try {
-                //        text: Dreimdi stórann brauðhleyf
-                //        all_errors: true
-                //        annotate_unparsed_sentences: true
-                //        generate_suggestion_list: false
-                //        suppress_suggestions: false
-                //        ignore_wordlist: ["like", "feisbook"]
-                //        one_sent: false
-                //        ignore_rules: ["Z002"]
                 val request = CorrectRequest(textToCorrect)
-//                val request = CorrectRequest(textToCorrect, true, true, false, false, listOf("like"), false, listOf("Z002"))
-                Log.d(TAG, "RETURNING THE REQUEST")
                 return API.correctApiPost(request)
             } catch (e: Exception) {
                 Log.d(TAG, "Exception: $e")
             }
-            Log.d(TAG, "RETURNING A NULL")
             return null
         }
     }
