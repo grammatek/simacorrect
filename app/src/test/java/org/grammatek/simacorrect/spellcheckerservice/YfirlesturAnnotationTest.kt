@@ -25,20 +25,6 @@ class YfirlesturAnnotationTest {
         "Er afhverju eitt eða tvö orð?"
     )
 
-    // TODO: Delete
-    @Test
-    fun `testing new changes`() {
-        val suggestionLimit = 5
-        val dictionary = arrayListOf<String>()
-        val text = "hallo"
-        val response = api.correctApiPost(CorrectRequest(text))
-        val ylAnnotation = YfirlesturAnnotation(response, text)
-        var suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        for (suggestions in suggestionInfo) {
-            assertThat(suggestions.suggestionsCount).isAtMost(suggestionLimit)
-        }
-    }
-
     @Test
     fun `we only get expected suggestions, nothing more, nothing less`() {
         val suggestionLimit = 5
