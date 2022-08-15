@@ -153,7 +153,6 @@ class YfirlesturAnnotationTest {
         val response = api.correctApiPost(CorrectRequest(text))
         val ylAnnotation = YfirlesturAnnotation(response, text)
         ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        // TODO: check for annotated words that are "suggestionless" as well.
         for (i in ylAnnotation.suggestionsIndices.indices) {
             assertThat(ylAnnotation.suggestionsIndices[i].startChar).isEqualTo(startIndices[i])
             assertThat(ylAnnotation.suggestionsIndices[i].endChar).isEqualTo(endIndices[i])
