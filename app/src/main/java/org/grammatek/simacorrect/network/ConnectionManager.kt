@@ -138,13 +138,12 @@ class ConnectionManager {
          * @return YfirlesturResponse which contains the spell checking
          * information of [textToCorrect].
          */
-        fun correctSentence(textToCorrect: String): CorrectResponse? {
+        fun correctSentence(request: CorrectRequest): CorrectResponse? {
             if(!g_isServiceReachable || !g_isNetworkConnected) {
                 Log.d(TAG, "correctSentence: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
                 return null
             }
             try {
-                val request = CorrectRequest(textToCorrect)
                 return API.correctApiPost(request)
             } catch (e: Exception) {
                 Log.d(TAG, "Exception: $e")
