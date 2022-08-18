@@ -32,6 +32,7 @@ object Serializer {
         contextual(StringBuilder::class, StringBuilderAdapter)
     }
 
+    @kotlinx.serialization.ExperimentalSerializationApi
     @JvmStatic
     val jvmJson: Json by lazy { Json { ignoreUnknownKeys = true; serializersModule = kotlinSerializationAdapters } }
 }
