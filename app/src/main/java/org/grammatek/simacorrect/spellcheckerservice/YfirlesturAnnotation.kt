@@ -91,16 +91,14 @@ class YfirlesturAnnotation(
 
                     var suggestion = annotation.suggest
                     val annotationTokenStartIndex = annotation.start!!
-                    var annotationTokenEndIndex = annotation.end!!
-                    // if words are split up we have to fix the indexing from Yfirlestur
-                    // the method called tries to determine if that is the case.
-                    if ((annotation.start != annotation.end) && annotation.suggest != null) {
-                        annotationTokenEndIndex = adjustTokenIndices(annotation.text!!, annotation.start!!, annotation.end!!, i)
-                    }
+                    val annotationTokenEndIndex = annotation.end!!
 
                     startChar = tokensIndices[i][annotationTokenStartIndex].startChar
                     endChar = tokensIndices[i][annotationTokenEndIndex].endChar
                     if (suggestions.size < suggestionsLimit && suggestion != null) {
+                        // The request sent to Yfirlestur is capitalized before being sent to get a
+                        // useful spell/grammar correction, this is the code that makes sure we put
+                        // the text back to lowercase (if it was so in the first place).
                         if (annotation.start == 0 && _unalteredOriginalText[startChar].isLowerCase()) {
                             suggestion = suggestion.replaceFirstChar { it.lowercaseChar() }
                         }
@@ -117,32 +115,6 @@ class YfirlesturAnnotation(
             }
         }
         return suggestionList
-    }
-
-    /**
-     * Determines if an annotation has correct token indices
-     * and tries to correct them.
-     *
-     * @param text
-     * @param startIndex
-     * @param endIndex
-     * @return Int
-     */
-    private fun adjustTokenIndices(text: String, startIndex: Int, endIndex: Int, sentenceIndex: Int): Int {
-        // Yfirlestur annotations have few cases where the token span is wrong.
-        // This only happens when Yfirlestur suggests a word be split into two.
-        // See https://github.com/mideind/Yfirlestur/issues/11 for more details.
-        val pattern = Regex("""'[^']*'""")
-        val realSuggestion = pattern.find(text)!!.value.replace("'", "")
-
-        val one = tokensIndices[sentenceIndex][startIndex].startChar
-        val two = tokensIndices[sentenceIndex][startIndex].endChar + 1
-
-        return if (realSuggestion.lowercase() == _unalteredOriginalText!!.substring(one, two).lowercase()){
-            startIndex
-        } else {
-            endIndex
-        }
     }
 
     /**
