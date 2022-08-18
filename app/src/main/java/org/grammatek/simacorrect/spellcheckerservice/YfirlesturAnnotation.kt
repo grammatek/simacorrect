@@ -146,18 +146,18 @@ class YfirlesturAnnotation(
 
     init {
         // Find which first N characters get trimmed by Yfirlestur.
+        val codeToIgnore = arrayListOf("Z002")
         val indexOfFirstCharacter = _unalteredOriginalText!!.lowercase().indexOf(_originalText.lowercase())
         if (indexOfFirstCharacter < 0) {
             throw Exception("input text and yfirlestur text differ")
         }
-
         // Group annotations by sentence
         val annotationList: ArrayList<List<Annotations>> = arrayListOf()
         for (results in _response?.result!!) {
             for (r in results) {
                 val annotations = arrayListOf<Annotations>()
                 for (annotation in r.annotations!!) {
-                    if (!(annotation.code == "Z002" && annotation.start == 0)) {
+                    if (!(codeToIgnore.contains(annotation.code) && annotation.start == 0)) {
                         annotations.add(annotation)
                     }
                 }
