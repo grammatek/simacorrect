@@ -76,9 +76,13 @@ class YfirlesturAnnotation(
                 var endChar = 0
 
                 for (annotation in tokenAnnotations) {
-                    val startCharIndexedForUnalteredText = tokensIndices[i][annotation.start!!].startChar
-                    val endCharIndexedForUnalteredText = tokensIndices[i][annotation.end!!].endChar
-                    val word = _unalteredOriginalText!!.substring(startCharIndexedForUnalteredText, endCharIndexedForUnalteredText + 1)
+                    // Get character indices from our constructed token indices
+                    // using the token indices from the response.
+                    startChar = tokensIndices[i][annotation.start!!].startChar
+                    endChar = tokensIndices[i][annotation.end!!].endChar
+                    var suggestion = annotation.suggest
+
+                    val word = _unalteredOriginalText!!.substring(startChar, endChar + 1)
                     if(annotation.code == null || dict.contains(word)) {
                         continue
                     }
@@ -89,12 +93,6 @@ class YfirlesturAnnotation(
                     }
                     flags.add(flag)
 
-                    var suggestion = annotation.suggest
-                    val annotationTokenStartIndex = annotation.start!!
-                    val annotationTokenEndIndex = annotation.end!!
-
-                    startChar = tokensIndices[i][annotationTokenStartIndex].startChar
-                    endChar = tokensIndices[i][annotationTokenEndIndex].endChar
                     if (suggestions.size < suggestionsLimit && suggestion != null) {
                         // The request sent to Yfirlestur is capitalized before being sent to get a
                         // useful spell/grammar correction, this is the code that makes sure we put
@@ -106,8 +104,10 @@ class YfirlesturAnnotation(
                     }
                 }
                 if(flags.isNotEmpty()) {
+                    // Add all the flags together but make sure to avoid adding duplicate ones.
                     val flag = flags.distinct().sum()
                     suggestionList.add(SuggestionsInfo(flag, suggestions.toTypedArray()))
+                    // Keep track of the indices so they can be accessed outside the class
                     suggestionsIndices.add(
                         AnnotationIndices(startChar, endChar)
                     )
