@@ -204,6 +204,7 @@ class YfirlesturAnnotationTest {
             assertThat(annotations[i].endChar).isEqualTo(expectedAnnotationIndices[i].endChar)
         }
     }
+<<<<<<< HEAD
 
     @Test
     fun `capitalization ignored for new sentences`() {
@@ -216,4 +217,6 @@ class YfirlesturAnnotationTest {
 
         assertThat(suggestion.count()).isEqualTo(0)
     }
+=======
+>>>>>>> re-removing a test that had been removed in a previous commit
 }
