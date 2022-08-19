@@ -204,15 +204,4 @@ class YfirlesturAnnotationTest {
             assertThat(annotations[i].endChar).isEqualTo(expectedAnnotationIndices[i].endChar)
         }
     }
-
-    @Test
-    fun `multiple sentences hold `() {
-        val suggestionLimit = 5
-        val text = "Það er víst. ég dreymi"
-        val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(text)
-        val ylAnnotation = YfirlesturAnnotation(response, text)
-        val asd = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        asd
-    }
 }
