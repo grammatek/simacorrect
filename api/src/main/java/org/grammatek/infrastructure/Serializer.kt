@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 object Serializer {
-    @kotlinx.serialization.ExperimentalSerializationApi
     @JvmStatic
     val kotlinSerializationAdapters = SerializersModule {
         contextual(BigDecimal::class, BigDecimalAdapter)
@@ -32,7 +31,6 @@ object Serializer {
         contextual(StringBuilder::class, StringBuilderAdapter)
     }
 
-    @kotlinx.serialization.ExperimentalSerializationApi
     @JvmStatic
-    val jvmJson: Json by lazy { Json { ignoreUnknownKeys = true; serializersModule = kotlinSerializationAdapters } }
+    val jvmJson: Json by lazy { Json { serializersModule = kotlinSerializationAdapters } }
 }
