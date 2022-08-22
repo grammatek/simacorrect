@@ -1,9 +1,9 @@
 /**
- * Grammar correction API
+ * Spelling/Grammar correction API
  *
- * This API interfaces Yfirlestur.is/
+ * This API interfaces an Yfirlestur.is compatible service
  *
- * The version of the OpenAPI document: 0.1.0-oas3
+ * The version of the OpenAPI document: 0.1.2
  * Contact: info@grammatek.com
  *
  * Please note:
@@ -22,7 +22,12 @@ package org.grammatek.apis
 
 import java.io.IOException
 
-import org.grammatek.models.YfirlesturResponse
+import org.grammatek.models.CorrectRequest
+import org.grammatek.models.CorrectResponse
+import org.grammatek.models.Error
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 import org.grammatek.infrastructure.ApiClient
 import org.grammatek.infrastructure.ApiResponse
@@ -35,8 +40,9 @@ import org.grammatek.infrastructure.RequestConfig
 import org.grammatek.infrastructure.RequestMethod
 import org.grammatek.infrastructure.ResponseType
 import org.grammatek.infrastructure.Success
+import org.grammatek.infrastructure.toMultiValue
 
-class DevelopersApi(basePath: kotlin.String = org.grammatek.apis.DevelopersApi.Companion.defaultBasePath) : ApiClient(basePath) {
+class CorrectApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
@@ -45,10 +51,10 @@ class DevelopersApi(basePath: kotlin.String = org.grammatek.apis.DevelopersApi.C
     }
 
     /**
-    * Correct grammar of text
     * 
-    * @param text
-    * @return YfirlesturResponse
+    * Correct spelling/grammar of text
+    * @param correctRequest  
+    * @return CorrectResponse
     * @throws IllegalStateException If the request is not correctly configured
     * @throws IOException Rethrows the OkHttp execute method exception
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -57,11 +63,11 @@ class DevelopersApi(basePath: kotlin.String = org.grammatek.apis.DevelopersApi.C
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun correctApiPost(text: kotlin.String) : YfirlesturResponse {
-        val localVarResponse = correctApiPostWithHttpInfo(text = text)
+    fun correctApiPost(correctRequest: CorrectRequest) : CorrectResponse {
+        val localVarResponse = correctApiPostWithHttpInfo(correctRequest = correctRequest)
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as YfirlesturResponse
+            ResponseType.Success -> (localVarResponse as Success<*>).data as CorrectResponse
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -76,19 +82,19 @@ class DevelopersApi(basePath: kotlin.String = org.grammatek.apis.DevelopersApi.C
     }
 
     /**
-    * Correct grammar of text
     * 
-    * @param text  
-    * @return ApiResponse<YfirlesturResponse?>
+    * Correct spelling/grammar of text
+    * @param correctRequest  
+    * @return ApiResponse<CorrectResponse?>
     * @throws IllegalStateException If the request is not correctly configured
     * @throws IOException Rethrows the OkHttp execute method exception
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun correctApiPostWithHttpInfo(text: kotlin.String) : ApiResponse<YfirlesturResponse?> {
-        val localVariableConfig = correctApiPostRequestConfig(text = text)
+    fun correctApiPostWithHttpInfo(correctRequest: CorrectRequest) : ApiResponse<CorrectResponse?> {
+        val localVariableConfig = correctApiPostRequestConfig(correctRequest = correctRequest)
 
-        return request<Map<String, Any?>, YfirlesturResponse>(
+        return request<CorrectRequest, CorrectResponse>(
             localVariableConfig
         )
     }
@@ -96,13 +102,14 @@ class DevelopersApi(basePath: kotlin.String = org.grammatek.apis.DevelopersApi.C
     /**
     * To obtain the request config of the operation correctApiPost
     *
-    * @param text  
+    * @param correctRequest  
     * @return RequestConfig
     */
-    fun correctApiPostRequestConfig(text: kotlin.String) : RequestConfig<Map<String, Any?>> {
-        val localVariableBody = mapOf("text" to text)
+    fun correctApiPostRequestConfig(correctRequest: CorrectRequest) : RequestConfig<CorrectRequest> {
+        val localVariableBody = correctRequest
         val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf("Content-Type" to "application/x-www-form-urlencoded")
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
         localVariableHeaders["Accept"] = "application/json"
 
         return RequestConfig(

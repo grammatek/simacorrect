@@ -1,0 +1,195 @@
+openapi: 3.0.0
+servers:
+  - description: Spelling and grammar correction API (for icelandic)
+    url: https://{url}
+    variables:
+      url:
+        default: yfirlestur.is
+        enum:
+          - yfirlestur.is
+          - api.grammatek.com/spelling/v0/correct
+info:
+  description: This API interfaces an Yfirlestur.is compatible service
+  version: 0.1.2
+  title: Spelling/Grammar correction API
+  contact:
+    email: info@grammatek.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: correct
+    description: Spell correct operation available to all users.
+paths:
+  /correct.api:
+    post:
+      tags:
+        - correct
+      description: Correct spelling/grammar of text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrectRequest'
+      responses:
+        '200':
+          description: Text corrected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorrectResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    CorrectRequest:
+      type: object
+      required:
+        - text
+        - annotate_unparsed_sentences
+        - suppress_suggestions
+        - ignore_wordlist
+        - ignore_rules
+      properties:
+        text:
+          type: string
+          example: 
+        annotate_unparsed_sentences:
+          type: boolean
+          default: true
+        suppress_suggestions:
+          type: boolean
+          default: false
+        ignore_wordlist:
+          type: array
+          default: []
+          items:
+            type: string
+        ignore_rules:
+          default: []
+          type: array
+          items:
+            type: string
+    CorrectResponse:
+      type: object
+      required:
+        - valid
+      properties:
+        result: # result is double nested
+          type: array 
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Result' 
+        stats:
+          $ref: '#/components/schemas/Stats'
+        text:
+          type: string
+          example: "Dreimdi stórann brauðhleyf"
+        valid:
+          type: boolean
+          example: true
+    Result:
+      type: object
+      required:
+        - corrected
+      properties:
+        annotations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Annotations'
+        corrected: 
+          type: string
+          example: "Dreymdi stóran brauðhleif"
+        nonce:
+          type: integer
+          example: 31518911
+        original: 
+          type: string
+          example: "Dreimdi stórann brauðhleyf"
+        token:
+          type: string
+          example: "88ff73469b8f47a4ab3937c2fb09e3bac8938593c44b466b86df04f5848ee38d"
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tokens'
+    Stats:
+      type: object
+      properties:
+        ambiguity:
+          type: number
+          format: double
+          example: 1.442249570307408
+        num_chars: 
+          type: integer
+          example: 26
+        num_parsed: 
+          type: integer
+          example: 1
+        num_sentences: 
+          type: integer
+          example: 1
+        num_tokens: 
+          type: integer
+          example: 3
+    Annotations:
+      type: object
+      properties:
+        code: 
+          type: string
+          example: "S004"
+        detail: 
+          type: string
+          example: null
+        end: 
+          type: integer
+          example: 0
+        end_char: 
+          type: integer
+          example: 6
+        start: 
+          type: integer
+          example: 0
+        start_char: 
+          type: integer
+          example: 0
+        suggest: 
+          type: string
+          example: "Dreymdi"
+        text: 
+          type: string
+          example: "Orðið 'Dreimdi' var leiðrétt í 'Dreymdi'"
+    Tokens:
+      type: object
+      properties:
+        i: 
+          type: integer
+          example: 0
+        k: 
+          type: integer
+          example: 6
+        o: 
+          type: string
+          example: Dreimdi
+        x: 
+          type: string
+          example: Dreymdi
+    Error:
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+      type: object

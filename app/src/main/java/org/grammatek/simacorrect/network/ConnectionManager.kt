@@ -7,8 +7,9 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.util.Log
-import org.grammatek.apis.DevelopersApi
-import org.grammatek.models.YfirlesturResponse
+import org.grammatek.apis.CorrectApi
+import org.grammatek.models.CorrectRequest
+import org.grammatek.models.CorrectResponse
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -121,7 +122,7 @@ class ConnectionManager {
 
     companion object {
         private val TAG = ConnectionManager::class.java.simpleName
-        private val API: DevelopersApi = DevelopersApi()
+        private val API: CorrectApi = CorrectApi()
 
         var g_isNetworkConnected: Boolean = false
             private set
@@ -136,13 +137,13 @@ class ConnectionManager {
          * @return YfirlesturResponse which contains the spell checking
          * information of [textToCorrect].
          */
-        fun correctSentence(textToCorrect: String): YfirlesturResponse? {
+        fun correctSentence(request: CorrectRequest): CorrectResponse? {
             if(!g_isServiceReachable || !g_isNetworkConnected) {
                 Log.d(TAG, "correctSentence: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
                 return null
             }
             try {
-                return API.correctApiPost(textToCorrect)
+                return API.correctApiPost(request)
             } catch (e: Exception) {
                 Log.d(TAG, "Exception: $e")
             }
