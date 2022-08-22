@@ -7,6 +7,7 @@ import android.provider.UserDictionary.Words
 import android.service.textservice.SpellCheckerService
 import android.util.Log
 import android.view.textservice.*
+import org.grammatek.models.CorrectRequest
 import org.grammatek.simacorrect.network.ConnectionManager
 
 /**
@@ -82,7 +83,8 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                         continue
                     }
 
-                    val response = ConnectionManager.correctSentence(text)
+                    val request = CorrectRequest(text)
+                    val response = ConnectionManager.correctSentence(request)
                     val ylAnnotation = YfirlesturAnnotation(response, textInfos[i].text)
                     suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit, _userDict).toTypedArray()
                     suggestionsIndices = ylAnnotation.suggestionsIndices.toTypedArray()
