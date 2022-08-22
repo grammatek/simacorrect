@@ -2,10 +2,11 @@ name: Android CI
 on:
   push:
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+<<<<<<< HEAD
         uses: actions/checkout@v3
       - name: Checkout Yfirlestur Repo
         uses: actions/checkout@v3
@@ -123,6 +124,9 @@ jobs:
       - name: Run Docker
         run: |
           docker run -dp 5002:5002 yfirlestur:latest
+=======
+        uses: actions/checkout@v2
+>>>>>>> changing CI file to match on master to resolve rebase issue
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
@@ -154,16 +158,13 @@ jobs:
           git submodule update --init
           ./gradlew assemble
           ./gradlew build -x test
-      - name: "Run tests"
-        run: |
-          ./gradlew test
       - name: Archive reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: archive-reports
           path: |
             app/build/reports/**/*
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> Update build.yml
 
@@ -172,3 +173,10 @@ jobs:
 =======
             
 >>>>>>> Cleaning up naming
+=======
+      - name: Download reports
+        uses: actions/download-artifact@v3.0.0
+        with:
+          path: |
+            app/build/reports/**/*
+>>>>>>> changing CI file to match on master to resolve rebase issue
