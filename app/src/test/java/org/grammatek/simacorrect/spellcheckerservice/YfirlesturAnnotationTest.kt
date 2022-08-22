@@ -204,19 +204,4 @@ class YfirlesturAnnotationTest {
             assertThat(annotations[i].endChar).isEqualTo(expectedAnnotationIndices[i].endChar)
         }
     }
-<<<<<<< HEAD
-
-    @Test
-    fun `capitalization ignored for new sentences`() {
-        val suggestionLimit = 5
-        val text = "Það er víst. það er víst"
-        val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(text)
-        val ylAnnotation = YfirlesturAnnotation(response, text)
-        val suggestion = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-
-        assertThat(suggestion.count()).isEqualTo(0)
-    }
-=======
->>>>>>> re-removing a test that had been removed in a previous commit
 }
