@@ -2,33 +2,11 @@ name: Android CI
 on:
   push:
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Checkout Yfirlestur Repo
-        uses: actions/checkout@v3
-        with:
-          repository: mideind/Yfirlestur
-          path: yfirlestur
-          ref: dockerfile_development
-      - name: Create Yfirlestur Dependencies
-        run: |
-          if [ ! -f "./gunicorn_user.txt" ]; then
-          echo 'root' > yfirlestur/gunicorn_user.txt
-          echo 'root' >> yfirlestur/gunicorn_user.txt
-          fi
-      - name: Build Docker
-        uses: docker/build-push-action@v2
-        with:
-          context: ./yfirlestur/
-          tags: yfirlestur:latest
-          push: false
-          load: true      
-      - name: Run Docker
-        run: |
-          docker run -dp 5002:5002 yfirlestur:latest
+        uses: actions/checkout@v2
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
@@ -43,14 +21,14 @@ jobs:
           git submodule update --init
           ./gradlew assemble
           ./gradlew build -x test
-      - name: "Run tests"
-        run: |
-          ./gradlew test
       - name: Archive reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: archive-reports
           path: |
             app/build/reports/**/*
-            
+      - name: Download reports
+        uses: actions/download-artifact@v3.0.0
+        with:
+          path: |
+            app/build/reports/**/*
