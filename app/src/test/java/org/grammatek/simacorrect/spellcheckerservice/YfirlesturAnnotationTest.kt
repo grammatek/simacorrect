@@ -1,46 +1,37 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.grammatek.apis.DevelopersApi
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.io.File
 
 typealias AnnotationIndices = YfirlesturAnnotation.AnnotationIndices
+
+@Serializable
+data class TestCases (
+    val input: String,
+    val suggestions: List<String>,
+)
 
 @RunWith(RobolectricTestRunner::class)
 class YfirlesturAnnotationTest {
     private val api = DevelopersApi("http://localhost:5002")
-    private val testCases: List<String> = listOf(
-        "Einn af drengjunum fóru í sund af gefnu tilefni.",
-        "Mig hlakkaði til.",
-        "eg dreimi um að leita af mindinni",
-        "Eg dreymdi kött.",
-        "Páli, sem hefur verið landsliðsmaður í fótbolta í sjö ár, langaði að horfa á sjónvarpið.",
-        "Páli, vini mínum, langaði að horfa á sjónvarpið.",
-        "Hestinum Skjóna vantaði hamar.",
-        "Önnu kveið # fyrir skóladeginum.",
-        "Er afhverju eitt eða tvö orð?"
-    )
+    private val file = File("src/test/res/test").readText()
+    private val _testCases = Json.decodeFromString<List<TestCases>>(file)
 
     @Test
-    fun `we only get expected suggestions, nothing more, nothing less`() {
+    fun `do expected and actual suggestions match`() {
         val suggestionLimit = 5
         val dictionary = arrayListOf<String>()
-        val testCasesExpectedSuggestions: List<List<String>> = listOf(
-            listOf("fór", "að gefnu tilefni"),
-            listOf("Ég"),
-            listOf("ég", "mig", "dreymi", "að", "myndinni"),
-            listOf("Ég", "Mig"),
-            listOf("Pál, sem hefur verið landsliðsmaður í fótbolta í sjö ár"),
-            listOf("Pál, vin minn"),
-            listOf("Hestinn skjóna"),
-            listOf("Anna"),
-            listOf("af hverju"),
-        )
-        for (i in testCases.indices) {
-            val response = api.correctApiPost(testCases[i])
-            val suggestionsInfo = YfirlesturAnnotation(response, testCases[i]).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+
+        for (testCase in _testCases) {
+            val response = api.correctApiPost(testCase.input)
+            val suggestionsInfo = YfirlesturAnnotation(response, testCase.input).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
             val actualSuggestions: MutableList<String> = arrayListOf()
             for (suggestionInfo in suggestionsInfo) {
                 for (j in 0 until suggestionInfo.suggestionsCount) {
@@ -48,7 +39,29 @@ class YfirlesturAnnotationTest {
                     actualSuggestions.add(suggestion)
                 }
             }
-            assertThat(actualSuggestions).containsExactlyElementsIn(testCasesExpectedSuggestions[i])
+            assertThat(actualSuggestions).containsExactlyElementsIn(testCase.suggestions)
+        }
+    }
+
+    @Test
+    fun `do expected and actual token start and end indices match`() {
+        val suggestionLimit = 5
+        val dictionary = arrayListOf<String>()
+
+        for (testCase in _testCases) {
+            val response = api.correctApiPost(testCase.input)
+            val ylAnnotation = YfirlesturAnnotation(response, testCase.input)
+            ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+
+            val tokenIndices = ylAnnotation.tokensIndices.flatten() // merge sentences for simplicity.
+            val suggestionsIndices = ylAnnotation.suggestionsIndices
+
+            for (t in suggestionsIndices) {
+                val startChar = tokenIndices.find { it.startChar == t.startChar }?.startChar ?: -1
+                val endChar = tokenIndices.find { it.endChar == t.endChar }?.endChar ?: -1
+                assertThat(t.startChar).isEqualTo(startChar)
+                assertThat(t.endChar).isEqualTo(endChar)
+            }
         }
     }
 
@@ -91,53 +104,28 @@ class YfirlesturAnnotationTest {
     fun `does Yfirlestur token count match our constructed token count`() {
         val suggestionLimit = 5
         val dictionary = arrayListOf<String>()
-        for (testCase in testCases) {
-            val response = api.correctApiPost(testCase)
-            val ylAnnotation = YfirlesturAnnotation(response, testCase)
+
+        for (testCase in _testCases) {
+            val response = api.correctApiPost(testCase.input)
+            val ylAnnotation = YfirlesturAnnotation(response, testCase.input)
             ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-            var size = 0
-            for (tokensIndex in ylAnnotation.tokensIndices) {
-                size += tokensIndex.size
-            }
-            assertThat(size).isEqualTo(response.stats?.numTokens ?: 0)
+
+            val ylAnnotationTokenCount = ylAnnotation.tokensIndices.flatten().count()
+            assertThat(ylAnnotationTokenCount).isEqualTo(response.stats?.numTokens)
         }
-    }
-
-    @Test
-    fun `is dictionary taken into account for suggestions`() {
-        val suggestionLimit = 5
-        val text = "Eg dreymi"
-        val response = api.correctApiPost(text)
-        val dictionary = arrayListOf<String>()
-        var suggestionsInfo = YfirlesturAnnotation(response, text).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        assertThat(suggestionsInfo).isNotEmpty()
-
-        dictionary.add("Eg")
-        suggestionsInfo = YfirlesturAnnotation(response, text).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        assertThat(suggestionsInfo).isEmpty()
-
-        dictionary.clear()
-        suggestionsInfo = YfirlesturAnnotation(response, text).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        assertThat(suggestionsInfo).isNotEmpty()
     }
 
     @Test
     fun `is suggestion limit enforced`() {
-        var suggestionLimit = 0
-        val text = "eg dreimi um að leita af mindinni"
-        val response = api.correctApiPost(text)
         val dictionary = arrayListOf<String>()
-
-        val ylAnnotation = YfirlesturAnnotation(response, text)
-        var suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        for (suggestions in suggestionInfo) {
-            assertThat(suggestions.suggestionsCount).isAtMost(suggestionLimit)
-        }
-
-        suggestionLimit = 1
-        suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        for (suggestions in suggestionInfo) {
-            assertThat(suggestions.suggestionsCount).isAtMost(suggestionLimit)
+        for (testCase in _testCases) {
+            var suggestionLimit = (0..2).random()
+            val response = api.correctApiPost(testCase.input)
+            val ylAnnotation = YfirlesturAnnotation(response, testCase.input)
+            var suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+            for (suggestions in suggestionInfo) {
+                assertThat(suggestions.suggestionsCount).isAtMost(suggestionLimit)
+            }
         }
     }
 
@@ -151,27 +139,11 @@ class YfirlesturAnnotationTest {
         val response = api.correctApiPost(text)
         val ylAnnotation = YfirlesturAnnotation(response, text)
         ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        // TODO: check for annotated words that are "suggestionless" as well.
+
         for (i in ylAnnotation.suggestionsIndices.indices) {
             assertThat(ylAnnotation.suggestionsIndices[i].startChar).isEqualTo(startIndices[i])
             assertThat(ylAnnotation.suggestionsIndices[i].endChar).isEqualTo(endIndices[i])
         }
-    }
-
-    @Test
-    fun `capitalization for the first word of a sentence to be ignored by Yfirlestur`() {
-        val suggestionLimit = 5
-        val capitalizedText = "Mig langar ekki út."
-        val nonCapitalizedText = "mig langar ekki út."
-        val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(capitalizedText)
-        // The spell checker service takes care of capitalizing the first letter
-        // so we have to test it differently e.g. see if the same sentence has
-        // different suggestions if the first word is capitalized or not.
-        val capitalizedSuggestionsInfo = YfirlesturAnnotation(response, capitalizedText).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-        val nonCapitalizedSuggestionsInfo = YfirlesturAnnotation(response, nonCapitalizedText).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
-
-        assertThat(capitalizedSuggestionsInfo).isEqualTo(nonCapitalizedSuggestionsInfo)
     }
 
     @Test
