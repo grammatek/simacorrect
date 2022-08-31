@@ -20,8 +20,8 @@ data class TestCases (
 
 @RunWith(RobolectricTestRunner::class)
 class YfirlesturAnnotationTest {
-    private val api = DevelopersApi("http://localhost:5002")
-    private val file = File("src/test/res/test").readText()
+    private val api = DevelopersApi("https://yfirlestur.is")
+    private val file = File("src/test/res/YfirlesturAnnotationTestCases.json").readText()
     private val _testCases = Json.decodeFromString<List<TestCases>>(file)
 
     @Test
