@@ -10,6 +10,8 @@ import android.util.Log
 import org.grammatek.apis.CorrectApi
 import org.grammatek.models.CorrectRequest
 import org.grammatek.models.CorrectResponse
+import org.grammatek.simacorrect.App
+import org.grammatek.simacorrect.R
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit
 class ConnectionManager {
     private var _threadPoolExecutor: ScheduledThreadPoolExecutor? = null
     private var _periodicFuture: ScheduledFuture<*>? = null
-    private val _apiServer: String = "yfirlestur.is"
+    private val _apiServer: String = App.appContext.resources.getString(R.string.grammatek_api_url)
 
     /**
      * Registers network callback to monitor network changes
@@ -122,7 +124,9 @@ class ConnectionManager {
 
     companion object {
         private val TAG = ConnectionManager::class.java.simpleName
-        private val API: CorrectApi = CorrectApi()
+        private val API: CorrectApi = CorrectApi(
+            "https://${App.appContext.resources.getString(R.string.grammatek_api_url)}"
+        )
 
         var g_isNetworkConnected: Boolean = false
             private set

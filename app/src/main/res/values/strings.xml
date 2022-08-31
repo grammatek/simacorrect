@@ -28,4 +28,6 @@
     <string name="email_subject">Feedback on Símacorrect</string>
     <string name="email_message">Feedback: </string>
     <string name="send_message">Send mail …</string>
+    <!-- API Url -->
+    <string name="grammatek_api_url" translatable="false">yfirlestur.grammatek.com</string>
 </resources>

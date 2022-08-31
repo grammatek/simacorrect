@@ -42,13 +42,7 @@ import org.grammatek.infrastructure.ResponseType
 import org.grammatek.infrastructure.Success
 import org.grammatek.infrastructure.toMultiValue
 
-class CorrectApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
-    companion object {
-        @JvmStatic
-        val defaultBasePath: String by lazy {
-            System.getProperties().getProperty(ApiClient.baseUrlKey, "https://yfirlestur.is")
-        }
-    }
+class CorrectApi(basePath: kotlin.String) : ApiClient(basePath) {
 
     /**
     * 
