@@ -1,0 +1,42 @@
+[
+	{
+		"input": "\uD83E\uDD76\u200B er kallt og \uD83E\uDD75 er heittt",
+		"suggestions": ["kalt", "heitt"]
+	},
+	{
+		"input": "Einn af drengjunum fóru í sund af gefnu tilefni.",
+		"suggestions": ["fór", "að gefnu tilefni"]
+	},
+	{
+		"input": "Mig hlakkaði til.",
+		"suggestions": ["Ég"]
+	},
+	{
+		"input": "eg dreimi um að leita af mindinni",
+		"suggestions": ["ég", "mig", "dreymi", "að", "myndinni"]
+	},
+	{
+		"input": "Eg dreymdi kött.",
+		"suggestions": ["Ég", "Mig"]
+	},
+	{
+		"input": "Páli, sem hefur verið landsliðsmaður í fótbolta í sjö ár, langaði að horfa á sjónvarpið.",
+		"suggestions": ["Pál, sem hefur verið landsliðsmaður í fótbolta í sjö ár"]
+	},
+	{
+		"input": "Páli, vini mínum, langaði að horfa á sjónvarpið.",
+		"suggestions": ["Pál, vin minn"]
+	},
+	{
+		"input": "Hestinum Skjóna vantaði hamar.",
+		"suggestions": ["Hestinn skjóna"]
+	},
+	{
+		"input": "Önnu kveið # fyrir skóladeginum.",
+		"suggestions": ["Anna"]
+	},
+	{
+		"input": "Er afhverju eitt eða tvö orð?",
+		"suggestions": ["af hverju"]
+	}
+]
