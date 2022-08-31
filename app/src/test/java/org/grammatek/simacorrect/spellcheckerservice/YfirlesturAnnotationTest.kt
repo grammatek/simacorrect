@@ -4,7 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.grammatek.apis.DevelopersApi
+import org.grammatek.apis.CorrectApi
+import org.grammatek.models.CorrectRequest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -20,9 +21,10 @@ data class TestCases (
 
 @RunWith(RobolectricTestRunner::class)
 class YfirlesturAnnotationTest {
-    private val api = DevelopersApi("http://localhost:5002")
+    private val api = CorrectApi("http://localhost:5002")
     private val file = File("src/test/res/YfirlesturAnnotationTestCases.json").readText()
     private val _testCases = Json.decodeFromString<List<TestCases>>(file)
+    private val _yfirlesturRulesToIgnore = listOf("Z002")
 
     @Test
     fun `do expected and actual suggestions match`() {
@@ -30,8 +32,9 @@ class YfirlesturAnnotationTest {
         val dictionary = arrayListOf<String>()
 
         for (testCase in _testCases) {
-            val response = api.correctApiPost(testCase.input)
-            val suggestionsInfo = YfirlesturAnnotation(response, testCase.input).getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+            val request = CorrectRequest(testCase.input, ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+            val response = api.correctApiPost(request)
+            val suggestionsInfo = YfirlesturAnnotation(response, testCase.input).getSuggestionsForAnnotatedWords(suggestionLimit)
             val actualSuggestions: MutableList<String> = arrayListOf()
             for (suggestionInfo in suggestionsInfo) {
                 for (j in 0 until suggestionInfo.suggestionsCount) {
@@ -49,9 +52,10 @@ class YfirlesturAnnotationTest {
         val dictionary = arrayListOf<String>()
 
         for (testCase in _testCases) {
-            val response = api.correctApiPost(testCase.input)
+            val request = CorrectRequest(testCase.input, ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+            val response = api.correctApiPost(request)
             val ylAnnotation = YfirlesturAnnotation(response, testCase.input)
-            ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+            ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit)
 
             val tokenIndices = ylAnnotation.tokensIndices.flatten() // merge sentences for simplicity.
             val suggestionsIndices = ylAnnotation.suggestionsIndices
@@ -87,9 +91,10 @@ class YfirlesturAnnotationTest {
         )
 
         for (i in texts.indices) {
-            val response = api.correctApiPost(texts[i])
+            val request = CorrectRequest(texts[i], ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+            val response = api.correctApiPost(request)
             val ylAnnotations = YfirlesturAnnotation(response, texts[i])
-            ylAnnotations.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+            ylAnnotations.getSuggestionsForAnnotatedWords(suggestionLimit)
             val annotations = ylAnnotations.suggestionsIndices
 
             assertThat(annotations.size).isEqualTo(expectedAnnotations[i].size)
@@ -106,9 +111,10 @@ class YfirlesturAnnotationTest {
         val dictionary = arrayListOf<String>()
 
         for (testCase in _testCases) {
-            val response = api.correctApiPost(testCase.input)
+            val request = CorrectRequest(testCase.input, ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+            val response = api.correctApiPost(request)
             val ylAnnotation = YfirlesturAnnotation(response, testCase.input)
-            ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+            ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit)
 
             val ylAnnotationTokenCount = ylAnnotation.tokensIndices.flatten().count()
             assertThat(ylAnnotationTokenCount).isEqualTo(response.stats?.numTokens)
@@ -120,9 +126,10 @@ class YfirlesturAnnotationTest {
         val dictionary = arrayListOf<String>()
         for (testCase in _testCases) {
             var suggestionLimit = (0..2).random()
-            val response = api.correctApiPost(testCase.input)
+            val request = CorrectRequest(testCase.input, ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+            val response = api.correctApiPost(request)
             val ylAnnotation = YfirlesturAnnotation(response, testCase.input)
-            var suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+            var suggestionInfo = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit)
             for (suggestions in suggestionInfo) {
                 assertThat(suggestions.suggestionsCount).isAtMost(suggestionLimit)
             }
@@ -136,9 +143,10 @@ class YfirlesturAnnotationTest {
         val startIndices = listOf(3, 23)
         val endIndices = listOf(10, 25)
         val dictionary = arrayListOf<String>()
-        val response = api.correctApiPost(text)
+        val request = CorrectRequest(text, ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+        val response = api.correctApiPost(request)
         val ylAnnotation = YfirlesturAnnotation(response, text)
-        ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+        ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit)
 
         for (i in ylAnnotation.suggestionsIndices.indices) {
             assertThat(ylAnnotation.suggestionsIndices[i].startChar).isEqualTo(startIndices[i])
@@ -153,8 +161,9 @@ class YfirlesturAnnotationTest {
         // special characters have different lengths in Yfirlestur, from Android.
         val suggestionLimit = 0
         val text = "\uD83E\uDD76\u200B er kallt og \uD83E\uDD75 er heittt"
-        val response = api.correctApiPost(text)
         val dictionary = arrayListOf<String>()
+        val request = CorrectRequest(text, ignoreRules = _yfirlesturRulesToIgnore, ignoreWordlist = dictionary)
+        val response = api.correctApiPost(request)
         val textLengthByYfirlestur = response.stats!!.numChars
         val textLengthByAndroid = response.text!!.length
         val expectedAnnotationIndices = listOf(
@@ -162,7 +171,7 @@ class YfirlesturAnnotationTest {
             AnnotationIndices(22, 27),
         )
         val ylAnnotation = YfirlesturAnnotation(response, text)
-        ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit, dictionary)
+        ylAnnotation.getSuggestionsForAnnotatedWords(suggestionLimit)
         val annotations = ylAnnotation.suggestionsIndices
 
         assertThat(textLengthByYfirlestur).isNotEqualTo(textLengthByAndroid)
