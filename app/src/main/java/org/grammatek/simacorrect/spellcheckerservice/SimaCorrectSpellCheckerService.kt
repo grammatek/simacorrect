@@ -121,13 +121,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 // If the SuggestionInfo result has no suggestions we originally wanted to annotate that
                 // word regardless, but doing so we would increase the occurrence of a bug with looping suggestions.
                 // https://github.com/grammatek/simacorrect/issues/22 for more details.
-                // grunna B-vegginn,
-                // pussa og grunna veginn i mancave,
-                // laga kringum ofn i master,
-                // setja horn i forstofu,
-                // fara yfir eldhus og laga allt sem er ljot af,
-                // gera loft inna badi rdy fyrir malingu,
-                //
                 if (result.suggestionsCount == 0) {
                     reconstructedSuggestions[i] = SuggestionsInfo(0, null)
                 } else {
