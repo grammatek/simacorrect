@@ -34,7 +34,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 false,
                 object : ContentObserver(null) {
                     override fun onChange(selfChange: Boolean) {
-                        Log.d(TAG, "Observed changes in user dictionary")
+                        if (LOG) Log.d(TAG, "Observed changes in user dictionary")
                         loadUserDictionary()
                     }
                 }
@@ -46,7 +46,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
          */
         @Synchronized
         private fun loadUserDictionary() {
-            Log.d(TAG, "loadUserDictionary")
             // from user dictionary, query for words with locale = "_locale"
             val cursor: Cursor = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
                 "${Words.LOCALE} = ?", arrayOf(_locale), null) ?: return
@@ -70,7 +69,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             textInfos: Array<out TextInfo>?,
             suggestionsLimit: Int,
         ): Array<SentenceSuggestionsInfo?> {
-            Log.d(TAG, "onGetSentenceSuggestionsMultiple: ${textInfos?.size}")
+            if(LOG) Log.d(TAG, "onGetSentenceSuggestionsMultiple: ${textInfos?.size}")
             if(textInfos == null || textInfos.isEmpty()) {
                 return emptyArray()
             }
@@ -136,6 +135,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         }
 
         companion object {
+            private const val LOG = false
             private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
         }
     }

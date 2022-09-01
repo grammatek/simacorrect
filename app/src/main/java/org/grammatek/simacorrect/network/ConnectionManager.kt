@@ -45,11 +45,11 @@ class ConnectionManager {
             override fun onAvailable(network: Network) {
                 val nc: NetworkCapabilities? = manager.getNetworkCapabilities(network)
                 if(nc != null && nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    Log.d(TAG, "Internet available")
+                    if (LOG) Log.d(TAG, "Internet available")
                     g_isNetworkConnected = true
                     startApiServiceHealthCheck()
                 } else {
-                    Log.d(TAG, "Internet unavailable")
+                    if (LOG) Log.d(TAG, "Internet unavailable")
                     g_isNetworkConnected = false
                     stopApiServiceHealthCheck()
                 }
@@ -98,7 +98,7 @@ class ConnectionManager {
             }
         } catch (e: IOException) {
             // Either we have a timeout, unreachable host or failed DNS lookup
-            Log.d(TAG, "IO Exception: ${e.message}")
+            if (LOG) Log.d(TAG, "IO Exception: ${e.message}")
             return false
         }
     }
@@ -108,21 +108,22 @@ class ConnectionManager {
      */
     private var periodicTask = Runnable {
         try {
-            Log.d(TAG, "Is Reachable: $g_isServiceReachable, Is Connected: $g_isNetworkConnected")
+            if (LOG) Log.d(TAG, "Is Reachable: $g_isServiceReachable, Is Connected: $g_isNetworkConnected")
 
             if (isHostAvailable(_apiServer, 443, 2000)) {
                 g_isServiceReachable = true
-                Log.d(TAG, "$_apiServer Service available!")
+                if (LOG) Log.d(TAG, "$_apiServer Service available!")
             } else {
                 g_isServiceReachable = false
-                Log.d(TAG, "$_apiServer Service is NOT available !")
+                if (LOG) Log.d(TAG, "$_apiServer Service is NOT available !")
             }
         } catch (e: Exception) {
-            Log.w(TAG, "Exception: " + e.message)
+            if (LOG) Log.w(TAG, "Exception: " + e.message)
         }
     }
 
     companion object {
+        private const val LOG = false
         private val TAG = ConnectionManager::class.java.simpleName
         private val API: CorrectApi = CorrectApi(
             "https://${App.appContext.resources.getString(R.string.grammatek_api_url)}"
@@ -143,13 +144,13 @@ class ConnectionManager {
          */
         fun correctSentence(request: CorrectRequest): CorrectResponse? {
             if(!g_isServiceReachable || !g_isNetworkConnected) {
-                Log.d(TAG, "correctSentence: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
+                if (LOG) Log.d(TAG, "correctSentence: isServiceReachable: $g_isServiceReachable, isNetworkConnected: $g_isNetworkConnected")
                 return null
             }
             try {
                 return API.correctApiPost(request)
             } catch (e: Exception) {
-                Log.d(TAG, "Exception: $e")
+                if (LOG) Log.d(TAG, "Exception: $e")
             }
             return null
         }

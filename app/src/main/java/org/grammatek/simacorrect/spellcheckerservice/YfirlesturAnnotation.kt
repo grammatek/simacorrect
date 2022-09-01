@@ -1,7 +1,6 @@
 package org.grammatek.simacorrect.spellcheckerservice
 
 import android.os.Build
-import android.util.Log
 import android.view.textservice.SuggestionsInfo
 import org.grammatek.models.Annotations
 import org.grammatek.models.CorrectResponse
@@ -118,7 +117,6 @@ class YfirlesturAnnotation(
      */
     private fun determineSuggestionFlag(code: String): Int {
         // First character of the code indicates which type of error.
-        Log.d("Yfirlestur", "string: ${yfirlesturCodes[code[0].toString()]}")
         return when {
             (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) &&
             yfirlesturCodes[code[0].toString()] == "grammar" -> {

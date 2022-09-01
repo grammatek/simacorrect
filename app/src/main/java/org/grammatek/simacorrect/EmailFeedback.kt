@@ -15,7 +15,6 @@ class EmailFeedback : AppCompatActivity() {
     }
 
     private fun sendEmail() {
-        Log.v(TAG, "Send email")
         val recipientEmail = "info@grammatek.com"
         val subject = getString(R.string.email_subject)
         val msg = getString(R.string.email_message)
@@ -28,7 +27,6 @@ class EmailFeedback : AppCompatActivity() {
         try {
             startActivity(Intent.createChooser(emailIntent, sendMsg))
             finish()
-            Log.i(TAG, "Finished sending email...")
         } catch (ex: ActivityNotFoundException) {
             Toast.makeText(
                 this@EmailFeedback,
