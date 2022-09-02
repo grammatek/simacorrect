@@ -6,7 +6,10 @@ Simacorrect is a spell checker that provides spell and grammar correction for Ic
 Spell checking is made via API calls by utilizing the web service [Yfirlestur](https://github.com/mideind/), which  wraps the spelling and grammar checking engine
 [GreynirCorrect](https://github.com/mideind/GreynirCorrect)
 
-Simacorrect is currently in closed beta but will be available on the Google Play Store in the near future.
+
+Simacorrect is available on the [Playstore]()
+
+Note for Samsung users. The spell checker is not compatible with the default keyboard for Samsung devices [Samsung Keyboard](https://play.google.com/store/apps/details?id=com.samsung.emojikeyboard.themes&hl=is&gl=US). You can switch to using other keyboards that support 3rd party spell checkers, such as Google's keyboard [Gboard](https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin&hl=is&gl=US) 
 
 ## Features
 - #### Supports correction for grammatical errors for Android version 12.0 and higher (blue annotation)
@@ -14,15 +17,16 @@ Simacorrect is currently in closed beta but will be available on the Google Play
 - #### Correction for spelling errors (red annotation)
     - This covers spelling, capitalization and abbreviation errors.
 
+
 ## Screenshots
 
-[<img src=".github/images/screenshot1.png" align="left"
-width="200"
-hspace="10" vspace="10">](/readme/Wallabag%20Reading%20List.png)
-
-[<img src=".github/images/screenshot2.png" align="center"
-width="200"
-hspace="10" vspace="10">](/readme/Wallabag%20Reading%20List.png)
+<p float="left">
+  <img src=".github/images/Google Pixel 4 XL Screenshot 0.png" width = 150/>
+  <img src=".github/images/Google Pixel 4 XL Screenshot 1.png" width = 150/>
+  <img src=".github/images/Google Pixel 4 XL Screenshot 2.png" width = 150/>
+  <img src=".github/images/Google Pixel 4 XL Screenshot 3.png" width = 150/>
+  <img src=".github/images/Google Pixel 4 XL Screenshot 4.png" width = 150/>
+</p>
 
 
 ## Contributing
