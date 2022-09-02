@@ -5,7 +5,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,13 +63,11 @@ class AboutActivity : AppCompatActivity() {
 
     private class SettingsArrayAdapter(
         context: Context,
-        values: Array<String?>,
-        data: Array<String?>
+        private val values: Array<String?>,
+        private val data: Array<String?>
     ) :
         ArrayAdapter<String?>(context, R.layout.activity_about, values) {
         private val ctx: Context = context
-        private val values: Array<String?> = values
-        private val data: Array<String?> = data
         override fun getViewTypeCount(): Int {
             return 2
         }
@@ -88,9 +85,5 @@ class AboutActivity : AppCompatActivity() {
             infoDetail.text = data[position]
             return cView
         }
-    }
-
-    companion object {
-        private val TAG = AboutActivity::class.java.simpleName
     }
 }

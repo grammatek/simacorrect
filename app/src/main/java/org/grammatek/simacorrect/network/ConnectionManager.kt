@@ -135,12 +135,12 @@ class ConnectionManager {
             private set
 
         /**
-         * Returns the corrected spelling for [textToCorrect] if successful.
+         * Returns the corrected spelling for text in [request] if successful.
          * Returns null if there is no correction to be made OR no connection.
          *
-         * @param [textToCorrect] The text to be spell checked (corrected).
+         * @param [request] The request to be spell checked (corrected).
          * @return YfirlesturResponse which contains the spell checking
-         * information of [textToCorrect].
+         * information of [request].
          */
         fun correctSentence(request: CorrectRequest): CorrectResponse? {
             if(!g_isServiceReachable || !g_isNetworkConnected) {
