@@ -1,11 +1,17 @@
 package org.grammatek.simacorrect
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.util.Linkify
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var etText: EditText
@@ -35,5 +41,35 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, AboutActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val privacyAccepted = this.getPreferences(Context.MODE_PRIVATE).getBoolean("privacy_info_accepted", false)
+        if (!privacyAccepted) {
+            showPrivacyNoticeDialog()
+        }
+    }
+
+    /**
+     * Shows Réttritun privacy notice dialog
+     */
+    private fun showPrivacyNoticeDialog() {
+        val privacyNotice = SpannableString(resources.getString(R.string.privacy_notice))
+        Linkify.addLinks(privacyNotice, Linkify.ALL)
+
+        val dialogBox: AlertDialog = AlertDialog.Builder(this)
+            .setTitle(R.string.privacy_title)
+            .setMessage(privacyNotice)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                this.getPreferences(Context.MODE_PRIVATE).edit {
+                    putBoolean("privacy_info_accepted", true)
+                    apply()
+                }
+            }
+            .setCancelable(false)
+            .create()
+
+        dialogBox.show()
     }
 }

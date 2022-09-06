@@ -10,6 +10,9 @@
     <string name="about">Um Réttritun</string>
     <string name="feedback">Ábendingar</string>
     <string name="text_box_hint">Sláðu inn texta</string>
+    <string name="ok">Í LAGI</string>
+    <string name="privacy_notice">Réttritun er síma app sem sendir texta úr textaboxum til vefþjónustu. Þar er unnið úr gögnunum og gefið til baka meðmæli um leiðréttingu á orðum. Engum notendaupplýsingum, eins og IP-tölum síma, er safnað gegnum Réttritun. Textar eru ekki vistaðir á vegum kerfisins. Sjá https://www.grammatek.com/legal#rettritun</string>
+    <string name="privacy_title">Mikilvægt</string>
     <!-- INFO -->
     <string name="info_copyright">Höfundaréttur</string>
     <string name="info_url">Veffang</string>
