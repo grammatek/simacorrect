@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Simacorrect</string>
+    <string name="app_name">Réttritun</string>
     <string name="title_activity_spell_checker_settings">SpellCheckerSettingsActivity</string>
 
 
-    <string name="spellchecker_name">SimaCorrect SpellChecker</string>
+    <string name="spellchecker_name">Réttritun Spell Checker</string>
     <string name="subtype_generic" translatable="true">%s</string>
     <!-- Main -->
     <string name="spell_checker_settings">Spell Checker Settings</string>
@@ -25,7 +25,7 @@
     <string name="info_benchmark">Benchmark</string>
     <string name="info_benchmark_value">times faster than real time</string>
     <!-- Feedback -->
-    <string name="email_subject">Feedback on Símacorrect</string>
+    <string name="email_subject">Feedback on Réttritun</string>
     <string name="email_message">Feedback: </string>
     <string name="send_message">Send mail …</string>
     <!-- API Url -->

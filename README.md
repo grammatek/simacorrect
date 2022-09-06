@@ -1,13 +1,13 @@
-# Simacorrect
+# Símacorrect - Réttritun fyrir Android
 
 ## Introduction
 
-Simacorrect is a spell checker that provides spell and grammar correction for Icelandic on Android devices.
+Réttritun is a spell checker that provides spell and grammar correction for Icelandic on Android devices.
 Spell checking is made via API calls by utilizing the web service [Yfirlestur](https://github.com/mideind/), which  wraps the spelling and grammar checking engine
 [GreynirCorrect](https://github.com/mideind/GreynirCorrect)
 
 
-Simacorrect is available on the [Playstore]()
+Réttritun is available on the [Playstore]()
 
 Note for Samsung users. The spell checker is not compatible with the default keyboard for Samsung devices [Samsung Keyboard](https://play.google.com/store/apps/details?id=com.samsung.emojikeyboard.themes&hl=is&gl=US). You can switch to using other keyboards that support 3rd party spell checkers, such as Google's keyboard [Gboard](https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin&hl=is&gl=US) 
 
