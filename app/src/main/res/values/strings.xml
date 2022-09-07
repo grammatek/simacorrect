@@ -11,7 +11,8 @@
     <string name="feedback">Feedback</string>
     <string name="text_box_hint">Try it out!</string>
     <string name="ok">OK</string>
-    <string name="privacy_notice">Réttritun sends text from input boxes to a web service for processing. The service sends back suggestions where applicable for spell and grammar correction. No personal information is stored on the mobile phone or the service. \n\nPlease visit our privacy policy at https://www.grammatek.com/legal#rettritun</string>    <string name="privacy_title">Important</string>
+    <string name="privacy_notice">Réttritun sends the user text to a web service for processing. After processing is finished, the text is immediately deleted from the phone and the web service. No personal data is collected and the IP address of the phone is anonymized when accessing the web service.\n\nPlease visit our privacy policy at https://www.grammatek.com/legal#rettritun</string>
+    <string name="privacy_title">Important</string>
     <!-- INFO -->
     <string name="info_copyright">Copyright</string>
     <string name="info_url">URL</string>
