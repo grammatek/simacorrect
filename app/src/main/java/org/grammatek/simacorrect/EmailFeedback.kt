@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
@@ -15,7 +14,6 @@ class EmailFeedback : AppCompatActivity() {
     }
 
     private fun sendEmail() {
-        Log.v(TAG, "Send email")
         val recipientEmail = "info@grammatek.com"
         val subject = getString(R.string.email_subject)
         val msg = getString(R.string.email_message)
@@ -28,7 +26,6 @@ class EmailFeedback : AppCompatActivity() {
         try {
             startActivity(Intent.createChooser(emailIntent, sendMsg))
             finish()
-            Log.i(TAG, "Finished sending email...")
         } catch (ex: ActivityNotFoundException) {
             Toast.makeText(
                 this@EmailFeedback,
@@ -36,9 +33,5 @@ class EmailFeedback : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
-    }
-
-    companion object {
-        private val TAG = EmailFeedback::class.java.simpleName
     }
 }

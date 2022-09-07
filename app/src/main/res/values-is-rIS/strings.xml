@@ -1,31 +1,34 @@
 <resources>
-    <string name="app_name">Simacorrect</string>
+    <string name="app_name">Réttritun</string>
     <string name="title_activity_spell_checker_settings">SpellCheckerSettingsActivity</string>
 
 
-    <string name="spellchecker_name">SimaCorrect VilluLeit</string>
+    <string name="spellchecker_name">Réttritun villuleit</string>
     <string name="subtype_generic" translatable="true">%s</string>
     <!-- Main -->
     <string name="spell_checker_settings">Stillingar fyrir villuleit</string>
-    <string name="about">Um Símacorrect</string>
+    <string name="about">Um Réttritun</string>
     <string name="feedback">Ábendingar</string>
     <string name="text_box_hint">Sláðu inn texta</string>
+    <string name="ok">Í LAGI</string>
+    <string name="privacy_notice">Réttritun er síma app sem sendir texta úr textaboxum til vefþjónustu. Þar er unnið úr gögnunum og gefið til baka meðmæli um leiðréttingu á orðum. Engum notendaupplýsingum, eins og IP-tölum síma, er safnað gegnum Réttritun. Textar eru ekki vistaðir á vegum kerfisins. Sjá https://www.grammatek.com/legal#rettritun</string>
+    <string name="privacy_title">Mikilvægt</string>
     <!-- INFO -->
     <string name="info_copyright">Höfundaréttur</string>
-    <string name="info_url">Netfang</string>
+    <string name="info_url">Veffang</string>
     <string name="info_privacy_notice">Persónuvernd</string>
-    <string name="info_privacy_notice_url">https://www.grammatek.com/legal#simacorrect</string>
+    <string name="info_privacy_notice_url">https://www.grammatek.com/legal#rettritun</string>
     <string name="info_android_version">Android Útgáfa</string>
     <string name="info_app_version">Útgáfa</string>
     <string name="info_version_error">Villa við að ná í uppl. um útgáfu</string>
     <string name="info_supported_abis">Studd ABIs</string>
     <string name="info_phone_model">Gerð síma</string>
     <string name="info_about">© (2022) Grammatek ehf.\nhttps://www.grammatek.com</string>
-    <string name="info_repo_url">https://github.com/grammatek/simacorrect</string>
+    <string name="info_repo_url">https://github.com/grammatek/rettritun</string>
     <string name="info_benchmark">Viðmið</string>
     <string name="info_benchmark_value">sinnum hraðar en rauntími</string>
     <!-- Feedback -->
-    <string name="email_subject">Ábendingar um Símacorrect</string>
+    <string name="email_subject">Ábendingar um Réttritun</string>
     <string name="email_message">Ábending: </string>
     <string name="send_message">Senda vefpóst …</string>
 </resources>

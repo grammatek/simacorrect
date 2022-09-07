@@ -22,6 +22,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         private lateinit var _locale: String
         private var _contentResolver: ContentResolver = contentResolver
         private var _userDict: ArrayList<String> = ArrayList()
+        private val _yfirlesturRulesToIgnore = listOf("Z002")
 
         override fun onCreate() {
             _locale = locale
@@ -33,7 +34,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                 false,
                 object : ContentObserver(null) {
                     override fun onChange(selfChange: Boolean) {
-                        Log.d(TAG, "Observed changes in user dictionary")
+                        if (LOG) Log.d(TAG, "Observed changes in user dictionary")
                         loadUserDictionary()
                     }
                 }
@@ -45,7 +46,6 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
          */
         @Synchronized
         private fun loadUserDictionary() {
-            Log.d(TAG, "loadUserDictionary")
             // from user dictionary, query for words with locale = "_locale"
             val cursor: Cursor = _contentResolver.query(Words.CONTENT_URI, arrayOf(Words.WORD),
                 "${Words.LOCALE} = ?", arrayOf(_locale), null) ?: return
@@ -69,7 +69,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
             textInfos: Array<out TextInfo>?,
             suggestionsLimit: Int,
         ): Array<SentenceSuggestionsInfo?> {
-            Log.d(TAG, "onGetSentenceSuggestionsMultiple: ${textInfos?.size}")
+            if(LOG) Log.d(TAG, "onGetSentenceSuggestionsMultiple: ${textInfos?.size}")
             if(textInfos == null || textInfos.isEmpty()) {
                 return emptyArray()
             }
@@ -82,11 +82,10 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
                     if (text.isBlank()) {
                         continue
                     }
-
-                    val request = CorrectRequest(text)
+                    val request = CorrectRequest(text, ignoreWordlist = _userDict, ignoreRules = _yfirlesturRulesToIgnore)
                     val response = ConnectionManager.correctSentence(request)
                     val ylAnnotation = YfirlesturAnnotation(response, textInfos[i].text)
-                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit, _userDict).toTypedArray()
+                    suggestionList = ylAnnotation.getSuggestionsForAnnotatedWords(suggestionsLimit).toTypedArray()
                     suggestionsIndices = ylAnnotation.suggestionsIndices.toTypedArray()
                 } catch (e: Exception) {
                     Log.e(TAG, "onGetSentenceSuggestionsMultiple: ${e.message} ${e.stackTrace.joinToString("\n")}")
@@ -136,6 +135,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
         }
 
         companion object {
+            private const val LOG = false
             private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
         }
     }

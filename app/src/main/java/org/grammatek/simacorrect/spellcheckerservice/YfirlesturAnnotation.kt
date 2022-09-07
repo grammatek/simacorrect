@@ -15,10 +15,9 @@ import java.lang.NullPointerException
  */
 class YfirlesturAnnotation(
     response: CorrectResponse?,
-    text: String?,
+    _unalteredOriginalText: String?,
     _response: CorrectResponse? = response,
     _originalText: String = response?.text ?: throw NullPointerException("response: $response"),
-    private val _unalteredOriginalText: String? = text
 ) {
     private val _annotations: List<List<Annotations>>
     val suggestionsIndices: MutableList<AnnotationIndices> = mutableListOf()
@@ -44,7 +43,7 @@ class YfirlesturAnnotation(
         val startChar: Int,
         val endChar: Int,
     ) {
-        var length: Int = endChar - startChar + 1
+        val length: Int = endChar - startChar + 1
     }
 
     /**
@@ -62,7 +61,7 @@ class YfirlesturAnnotation(
      *
      * @returns List<SuggestionsInfo>
      */
-    fun getSuggestionsForAnnotatedWords(suggestionsLimit: Int, dict: ArrayList<String>): List<SuggestionsInfo> {
+    fun getSuggestionsForAnnotatedWords(suggestionsLimit: Int): List<SuggestionsInfo> {
         val suggestionList = mutableListOf<SuggestionsInfo>()
         for (i in _annotations.indices) {
             // Group annotations in a list that have the same start AND end index.
@@ -80,10 +79,9 @@ class YfirlesturAnnotation(
                     // using the token indices from the response.
                     startChar = tokensIndices[i][annotation.start!!].startChar
                     endChar = tokensIndices[i][annotation.end!!].endChar
-                    var suggestion = annotation.suggest
+                    val suggestion = annotation.suggest
 
-                    val word = _unalteredOriginalText!!.substring(startChar, endChar + 1)
-                    if(annotation.code == null || dict.contains(word)) {
+                    if(annotation.code == null) {
                         continue
                     }
 
@@ -94,12 +92,6 @@ class YfirlesturAnnotation(
                     flags.add(flag)
 
                     if (suggestions.size < suggestionsLimit && suggestion != null) {
-                        // The request sent to Yfirlestur is capitalized before being sent to get a
-                        // useful spell/grammar correction, this is the code that makes sure we put
-                        // the text back to lowercase (if it was so in the first place).
-                        if (annotation.start == 0 && _unalteredOriginalText[startChar].isLowerCase()) {
-                            suggestion = suggestion.replaceFirstChar { it.lowercaseChar() }
-                        }
                         suggestions.add(suggestion)
                     }
                 }
@@ -146,7 +138,6 @@ class YfirlesturAnnotation(
 
     init {
         // Find which first N characters get trimmed by Yfirlestur.
-        val codeToIgnore = arrayListOf("Z002")
         val indexOfFirstCharacter = _unalteredOriginalText!!.lowercase().indexOf(_originalText.lowercase())
         if (indexOfFirstCharacter < 0) {
             throw Exception("input text and yfirlestur text differ")
@@ -157,9 +148,7 @@ class YfirlesturAnnotation(
             for (r in results) {
                 val annotations = arrayListOf<Annotations>()
                 for (annotation in r.annotations!!) {
-                    if (!(codeToIgnore.contains(annotation.code) && annotation.start == 0)) {
                         annotations.add(annotation)
-                    }
                 }
                 annotationList.add(annotations)
             }
