@@ -1,4 +1,4 @@
-package org.grammatek.simacorrect.spellcheckerservice
+package org.grammatek.rettritun.spellcheckerservice
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.Serializable

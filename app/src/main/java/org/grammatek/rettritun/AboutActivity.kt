@@ -1,4 +1,4 @@
-package org.grammatek.simacorrect
+package org.grammatek.rettritun
 
 import android.content.Context
 import android.content.pm.PackageInfo

@@ -1,4 +1,4 @@
-package org.grammatek.simacorrect.network
+package org.grammatek.rettritun.network
 
 import android.app.Application
 import android.content.Context
@@ -10,8 +10,8 @@ import android.util.Log
 import org.grammatek.apis.CorrectApi
 import org.grammatek.models.CorrectRequest
 import org.grammatek.models.CorrectResponse
-import org.grammatek.simacorrect.App
-import org.grammatek.simacorrect.R
+import org.grammatek.rettritun.App
+import org.grammatek.rettritun.R
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
