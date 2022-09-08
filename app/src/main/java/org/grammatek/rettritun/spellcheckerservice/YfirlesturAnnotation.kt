@@ -1,4 +1,4 @@
-package org.grammatek.simacorrect.spellcheckerservice
+package org.grammatek.rettritun.spellcheckerservice
 
 import android.os.Build
 import android.view.textservice.SuggestionsInfo

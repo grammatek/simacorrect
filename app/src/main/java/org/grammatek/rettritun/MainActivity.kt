@@ -1,4 +1,4 @@
-package org.grammatek.simacorrect
+package org.grammatek.rettritun
 
 import android.content.Context
 import android.content.Intent
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         val privacyNotice = SpannableString(resources.getString(R.string.privacy_notice))
         Linkify.addLinks(privacyNotice, Linkify.ALL)
 
-        val dialogBox: AlertDialog = AlertDialog.Builder(this)
+        val dialogBox: AlertDialog = AlertDialog.Builder(this, R.style.theme_dialog)
             .setTitle(R.string.privacy_title)
             .setMessage(privacyNotice)
             .setPositiveButton(R.string.ok) { _, _ ->

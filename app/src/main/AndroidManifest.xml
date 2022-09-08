@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.grammatek.simacorrect">
+    package="org.grammatek.rettritun">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".App"
+        android:name="org.grammatek.rettritun.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Simacorrect">
+        android:theme="@style/Theme.Rettritun">
         <activity
-            android:name=".EmailFeedback"
+            android:name="org.grammatek.rettritun.EmailFeedback"
             android:exported="false" />
 
         <service
-            android:name=".spellcheckerservice.SimaCorrectSpellCheckerService"
+            android:name="org.grammatek.rettritun.spellcheckerservice.RettritunSpellCheckerService"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_TEXT_SERVICE">
@@ -32,7 +32,7 @@
         </service>
 
         <activity
-            android:name=".MainActivity"
+            android:name="org.grammatek.rettritun.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,9 +41,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AboutActivity"
+            android:name="org.grammatek.rettritun.AboutActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName="org.grammatek.rettritun.MainActivity" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package org.grammatek.simacorrect
+package org.grammatek.rettritun
 
 import android.content.ActivityNotFoundException
 import android.content.Intent

@@ -1,14 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Simacorrect" parent="Theme.MaterialComponents.DayNight">
+    <style name="Theme.Rettritun" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/baby_blue</item>
+        <item name="colorPrimary">@color/rettritun_blue</item>
         <item name="colorPrimaryVariant">@color/light_black</item>
         <item name="colorOnPrimary">@color/light_black</item>
-        <item name="colorControlNormal">@color/teal_700</item>
+        <item name="colorControlNormal">@color/rettritun_blue_light</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">@color/rettritun_blue</item>
+        <item name="colorSecondaryVariant">@color/rettritun_blue_light</item>
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
@@ -18,7 +18,7 @@
 
     <!-- Custom Action bar Style -->
     <style name="CustomActionBarStyle" parent="Theme.MaterialComponents.Light">
-        <item name="colorPrimary">@color/baby_blue</item>
+        <item name="colorPrimary">@color/rettritun_blue</item>
         <item name="colorControlNormal">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
     </style>
@@ -34,5 +34,11 @@
         <item name="android:textColorLink">#6EB1F8</item>
         <item name="android:autoLink">web</item>
         <item name="android:linksClickable">true</item>
+    </style>
+
+    <style name="theme_dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#546E7A</item>
+        <item name="android:textColorPrimary">#37474F</item>
+        <item name="android:textSize">20sp</item>
     </style>
 </resources>
