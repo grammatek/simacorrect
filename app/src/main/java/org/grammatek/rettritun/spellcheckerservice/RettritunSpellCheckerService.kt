@@ -11,9 +11,9 @@ import org.grammatek.models.CorrectRequest
 import org.grammatek.rettritun.network.ConnectionManager
 
 /**
- * Implements Simacorrect spell checking as a SpellCheckerService
+ * Implements Rettritun spell checking as a SpellCheckerService
  */
-class SimaCorrectSpellCheckerService : SpellCheckerService() {
+class RettritunSpellCheckerService : SpellCheckerService() {
     override fun createSession(): Session {
         return AndroidSpellCheckerSession(contentResolver)
     }
@@ -136,7 +136,7 @@ class SimaCorrectSpellCheckerService : SpellCheckerService() {
 
         companion object {
             private const val LOG = false
-            private val TAG = SimaCorrectSpellCheckerService::class.java.simpleName
+            private val TAG = RettritunSpellCheckerService::class.java.simpleName
         }
     }
 }

@@ -17,7 +17,7 @@
     <string name="info_copyright">Copyright</string>
     <string name="info_url">URL</string>
     <string name="info_privacy_notice">Privacy notice</string>
-    <string name="info_privacy_notice_url">https://www.grammatek.com/legal#simacorrect</string>
+    <string name="info_privacy_notice_url">https://www.grammatek.com/legal#rettritun</string>
     <string name="info_android_version">Android Version</string>
     <string name="info_app_version">Version</string>
     <string name="info_version_error">Error retrieving version info</string>
