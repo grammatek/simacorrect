@@ -1,6 +1,5 @@
 package org.grammatek.rettritun
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -22,9 +21,8 @@ class AboutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = "About"
-        setContentView(R.layout.activity_about2)
+        setContentView(R.layout.activity_about)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         populateAboutInformation()
     }
 
