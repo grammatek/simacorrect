@@ -7,27 +7,25 @@ import android.provider.Settings
 import android.text.SpannableString
 import android.text.util.Linkify
 import android.widget.EditText
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.content.edit
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var etText: EditText
-    private lateinit var btnSettings: TextView
-    private lateinit var btnFeedback: TextView
-    private lateinit var btnAbout: TextView
+    private lateinit var btnSettings: CardView
+    private lateinit var btnFeedback: CardView
+    private lateinit var btnAbout: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         etText = findViewById(R.id.textInputEditText)
-        btnFeedback = findViewById(R.id.feedback)
-        btnSettings = findViewById(R.id.settings)
-        btnAbout = findViewById(R.id.about)
-
+        btnFeedback = findViewById(R.id.feedbackCard)
+        btnSettings = findViewById(R.id.settingsCard)
+        btnAbout = findViewById(R.id.aboutCard)
         btnFeedback.setOnClickListener {
             val intent = Intent(this, EmailFeedback::class.java)
             startActivity(intent)
