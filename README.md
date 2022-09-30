@@ -3,13 +3,15 @@
 ## Introduction
 
 Réttritun is a spell checker that provides spell and grammar correction for Icelandic on Android devices.
-Spell checking is made via API calls by utilizing the web service [Yfirlestur](https://github.com/mideind/), which  wraps the spelling and grammar checking engine
-[GreynirCorrect](https://github.com/mideind/GreynirCorrect)
+Spell checking is made via API calls by utilizing the web service [Grammatek Yfirlestur](https://yfirlestur.grammatek.com/), which itself wraps the spelling and grammar checking engine
+[GreynirCorrect](https://github.com/mideind/GreynirCorrect).
 
 
-Réttritun is available on the [Playstore]()
+Réttritun is available on the [Playstore](https://play.google.com/store/apps/details?id=org.grammatek.simacorrect)
 
-Note for Samsung users. The spell checker is not compatible with the default keyboard for Samsung devices [Samsung Keyboard](https://play.google.com/store/apps/details?id=com.samsung.emojikeyboard.themes&hl=is&gl=US). You can switch to using other keyboards that support 3rd party spell checkers, such as Google's keyboard [Gboard](https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin&hl=is&gl=US) 
+Note for Samsung users. The spell checker is not compatible with the default keyboard for Samsung devices [Samsung Keyboard](https://play.google.com/store/apps/details?id=com.samsung.emojikeyboard.themes&hl=is&gl=US). You can switch to using other keyboards that support 3rd party spell checkers, such as Google's keyboard [Gboard](https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin&hl=is&gl=US).
+We recommend though using AnySoftKeyboard [AnySoftKeyboard](https://play.google.com/store/apps/details?id=com.menny.android.anysoftkeyboard&hl=is&gl=US) as it supports 3rd party spell checkers and also makes available an Icelandic language pack developed by us.
+If you are able to compile and install AnySoftKeyboard yourself, we have created a fork of AnySoftKeyboard that improves the Icelandic language pack and adds powerful Icelandic next-word completion to it. You can find our fork in the branch `abn-autocompletion` [here](https://github.com/grammatek/AnySoftKeyboard/tree/abn-autocompletion).
 
 ## Features
 - #### Supports correction for grammatical errors for Android version 12.0 and higher (blue annotation)
