@@ -1,4 +1,4 @@
-package org.grammatek.rettritun.spellcheckerservice
+package org.grammatek.simacorrect.spellcheckerservice
 
 import android.content.ContentResolver
 import android.database.ContentObserver
@@ -8,7 +8,7 @@ import android.service.textservice.SpellCheckerService
 import android.util.Log
 import android.view.textservice.*
 import org.grammatek.models.CorrectRequest
-import org.grammatek.rettritun.network.ConnectionManager
+import org.grammatek.simacorrect.network.ConnectionManager
 
 /**
  * Implements Rettritun spell checking as a SpellCheckerService

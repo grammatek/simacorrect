@@ -1,8 +1,8 @@
-package org.grammatek.rettritun
+package org.grammatek.simacorrect
 
 import android.app.Application
 import android.content.Context
-import org.grammatek.rettritun.network.ConnectionManager
+import org.grammatek.simacorrect.network.ConnectionManager
 
 class App : Application() {
     private lateinit var _connectionChecker: ConnectionManager
