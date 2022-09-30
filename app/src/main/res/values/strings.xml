@@ -13,8 +13,14 @@
     <string name="ok">OK</string>
     <string name="privacy_notice">Réttritun sends the user text to a web service for processing. After processing is finished, the text is immediately deleted from the phone and the web service. No personal data is collected and the IP address of the phone is anonymized when accessing the web service.\n\nPlease visit our privacy policy at https://www.grammatek.com/legal#rettritun</string>
     <string name="privacy_title">Important</string>
+git     <string name="open_in_new">Open in new</string>
     <!-- INFO -->
+    <string name="info_other">Other</string>
+    <string name="info_github">Github</string>
+    <string name="info_about_device_title">Device Information</string>
     <string name="info_copyright">Copyright</string>
+    <string name="info_copyright_text">© (2022) Grammatek ehf.</string>
+    <string name="info_copyright_url">https://www.grammatek.com</string>
     <string name="info_url">URL</string>
     <string name="info_privacy_notice">Privacy notice</string>
     <string name="info_privacy_notice_url">https://www.grammatek.com/legal#rettritun</string>
